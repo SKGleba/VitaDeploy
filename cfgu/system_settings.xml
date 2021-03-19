@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<system_settings plugin="system_settings_plugin" version="1.0" back_button_color="20.0, 1.0, 5.0, 1.0">
+  <setting_list id="vd_main_screen" title="VitaDeploy">
+    <!-- molecularshell -->
+    <button id="id_ms" icon="tex_format" title="Launch molecularShell"/>
+    <!-- sd2vita-as-grw0 -->
+    <button id="id_gc" icon="tex_format" title="Mount SD2Vita to grw0:" success_dialog_message="Mounted" error_dialog_message="Failed"/>
+    <!-- spacer -->
+    <label id="id_unsafe" title="System customization:"/>
+    <!-- Update -->
+    <setting_list id="id_fwi_pre" icon="tex_spanner" title="Install a different OS">
+      <!-- QI -->
+      <button id="id_qi" icon="tex_format" title="Quick 3.65 install" error_dialog_message="error: minFw > targetFw"/>
+      <!-- spacer -->
+      <label id="id_cup" title="Custom install:"/>
+      <!-- PUP -->
+      <setting_list id="id_mdr" icon="tex_spanner" title="Playstation Update Package">
+        <list id="id_mdr_tfw" key="/CONFIG/CMDR/target" icon="tex_spanner" title="Target firmware:">
+          <list_item id="id_mdr_cust" title="ud0:PSP2UPDATE/PSP2UPDAT.PUP" value="0"/>
+          <list_item id="id_mdr_vold" title="Download 3.60 PUP" value="1"/>
+	        <list_item id="id_mdr_best" title="Download 3.65 PUP" value="2"/>
+	        <list_item id="id_mdr_ntls" title="Download 3.68 PUP" value="3"/>
+        </list>
+        <list id="id_mdr_tai" key="/CONFIG/CMDR/taicfg" icon="tex_spanner" title="taiHEN configuration:">
+          <list_item id="id_mdr_cfw0" title="ud0:ur0-patch.zip" value="0"/>
+          <list_item id="id_mdr_cfw1" title="Disabled" value="1"/>
+	        <list_item id="id_mdr_cfw2" title="HEN only" value="2"/>
+          <list_item id="id_mdr_cfw3" title="Recommended" value="3"/>
+          <list_item id="id_mdr_cfw4" title="R + YAMT" value="4"/>
+        </list>
+        <toggle_switch id="mdr_enso" key="/CONFIG/CMDR/ensonx" title="Install enso" description="enso is a permanent hack for 3.60/3.65" icon="tex_system"/>
+        <button id="id_ip" icon="tex_format" title="Install the selected firmware" error_dialog_message="error: minFw > targetFw"/>
+      </setting_list>
+      <!-- spacer -->
+      <label id="id_misc_label" title="Miscellaneous:"/>
+      <!-- ud0 format -->
+      <button id="id_uf" icon="tex_format" title="Clean the update partition" success_dialog_message="Cleaned" error_dialog_message="Format failed"/>
+    </setting_list>
+    <!-- App installer -->
+    <setting_list id="id_appi_menu" icon="tex_spanner" title="App downloader">
+      <!-- Install -->
+      <button id="id_ia" icon="tex_format" title="Download the selected apps"/>
+      <!-- spacer -->
+      <label id="id_applist_label" title="Application list:"/>
+      <toggle_switch id="dl_vshell" key="/CONFIG/APPI/vshl" title="VitaShell" description="A powerful file manager" icon="tex_system"/>
+      <toggle_switch id="dl_hbrowser" key="/CONFIG/APPI/vhbb" title="Vita Homebrew Browser" description="A homebrew store/database" icon="tex_system"/>
+      <toggle_switch id="dl_itls" key="/CONFIG/APPI/itls" title="iTLS installer" description="iTLS adds TLSv1.2 support in older firmwares" icon="tex_system"/>
+      <toggle_switch id="dl_enso" key="/CONFIG/APPI/enso" title="enso installer" description="enso is a permanent hack for 3.60/3.65" icon="tex_system"/>
+      <toggle_switch id="dl_yamt" key="/CONFIG/APPI/yamt" title="YAMT installer" description="YAMT is a storage manager and driver for the SD2Vita adapter" icon="tex_system"/>
+      <toggle_switch id="dl_adrenaline" key="/CONFIG/APPI/adre" title="Adrenaline" description="PSPEMU custom firmware" icon="tex_system"/>
+      <toggle_switch id="dl_pkgj" key="/CONFIG/APPI/pkgj" title="PKGj" description="download and unpack pkg files directly on Vita" icon="tex_system"/>
+      <toggle_switch id="dl_savemgr" key="/CONFIG/APPI/save" title="vita-savemgr" description="Savegame dumper/restorer" icon="tex_system"/>
+      <toggle_switch id="dl_themedit" key="/CONFIG/APPI/thme" title="Custom Themes Manager" icon="tex_system"/>
+      <toggle_switch id="dl_batfix" key="/CONFIG/APPI/batf" title="batteryFixer" description="Fixes common battery issues" icon="tex_system"/>
+      <toggle_switch id="dl_regedit" key="/CONFIG/APPI/rege" title="Registry Editor" icon="tex_system"/>
+      <toggle_switch id="dl_psvident" key="/CONFIG/APPI/vidr" title="PSVident" description="Shows advanced console info" icon="tex_system"/>
+    </setting_list>
+    <!-- misc -->
+    <setting_list id="id_misc" icon="tex_spanner" title="Miscellaneous">
+      <!-- GitLab -->
+      <toggle_switch id="use_backup" key="/CONFIG/CMDR/backup" title="Use the backup server" description="Switches to the GitLab repo for file downloads" icon="tex_system"/>
+      <!-- FatFormat -->
+      <setting_list id="id_frdr" icon="tex_spanner" title="Format a storage device">
+        <list id="id_frdr_stor" key="/CONFIG/FRDR/target" icon="tex_spanner" title="Target:">
+          <list_item id="id_frdr_gcsd" title="SD2Vita" value="0"/>
+          <list_item id="id_frdr_usb5" title="PSVSD" value="1"/>
+	        <list_item id="id_frdr_usb0" title="USB" value="2"/>
+	        <list_item id="id_frdr_xint" title="Internal MC" value="3"/>
+	        <list_item id="id_frdr_xext" title="External MC" value="4"/>
+        </list>
+        <list id="id_frdr_cop" key="/CONFIG/FRDR/fstype" icon="tex_spanner" title="Filesystem:">
+		      <list_item id="id_frdr_tex" title="TexFAT" value="7"/>
+		      <list_item id="id_frdr_f16" title="FAT16" value="6"/>
+		      <list_item id="id_frdr_f32" title="FAT32" value="5"/>
+        </list>
+	      <button id="id_frdr_format" icon="tex_format" title="Format target storage" success_dialog_message="Formatted" error_dialog_message="Format failed"/>
+      </setting_list>
+      <!-- IMCUnlock -->
+      <button id="id_iu" icon="tex_spanner" title="Create an internal memory card"/>
+      <!-- NAAVLS -->
+      <button id="id_na" icon="tex_spanner" title="Toggle the AutoAVLS feature" success_dialog_message="Done" error_dialog_message="Failed"/>
+      <!-- IDU off -->
+      <button id="id_dm" icon="tex_format" title="Disable IDU mode" success_dialog_message="Disabled, please reboot" error_dialog_message="Failed"/>
+      <!-- PM off -->
+      <button id="id_pm" icon="tex_format" title="Disable manufacturing mode" success_dialog_message="Disabled, please reboot" error_dialog_message="Failed"/>
+    </setting_list>
+    <!-- Reboot -->
+    <button id="id_frdr_reboot" icon="tex_format" title="Reboot"/>
+  </setting_list>
+</system_settings>

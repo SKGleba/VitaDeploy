@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<livearea style="a1" format-ver="01.00" content-rev="1">
+	<livearea-background>
+		<image>bg.png</image>
+	</livearea-background>
+
+	<frame id="frame1">
+        <liveitem>
+            <target>http://go.henkaku.xyz/</target>
+            <background x="20" y="-10" >hen.png</background>
+        </liveitem>
+    </frame>
+
+	<frame id="frame3">
+		<liveitem>
+			<text valign="bottom" align="left" text-align="left" word-wrap="off" ellipsis="on">
+				<str size="24" color="#ffffff" shadow="on">VitaDeploy v0.5-public-safe</str>
+			</text>
+		</liveitem>
+	</frame>
+</livearea>

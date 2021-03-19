@@ -1,0 +1,31 @@
+(
+cd cfgk/;
+cmake ./ && make;
+mv vdkernel.skprx ../cfgk.skprx;
+cp stubs/libvdkernel_stub.a ../launcher/libvdkernel_stub.a && cp stubs/libvdkernel_stub.a ../main/libvdkernel_stub.a;
+rm -rf CMakeFiles && rm cmake_install.cmake && rm CMakeCache.txt && rm Makefile;
+rm vdkernel.velf && rm vdkernel.skprx.out && rm vdkernel && rm stubs.yml;
+cd ../cfgu/;
+cmake ./ && make;
+mv configure.suprx ../cfgu.suprx;
+rm -rf CMakeFiles && rm cmake_install.cmake && rm CMakeCache.txt && rm Makefile;
+rm system_settings.xml.o && rm user && rm user.velf && rm configure.suprx.out;
+cd ../launcher/;
+make;
+mv launcher.bin ../eboot.bin;
+rm main.o && rm launcher.elf && rm launcher.velf;
+cd ../main/;
+make;
+mv main.bin ../main.self;
+rm main.o && rm graphics.o && rm font.o && rm Archives.o && rm main.elf && rm main.velf;
+cd ../tovs0/;
+make;
+rm main.o && rm graphics.o && rm font.o && rm eboot.elf && rm eboot.velf && rm eboot.bin && rm param.sfo;
+cd ../;
+make;
+rm eboot.bin && rm main.self && rm cfgu.suprx && rm cfgk.skprx && rm param.sfo;
+rm main/libvdkernel_stub.a && rm launcher/libvdkernel_stub.a && rm -rf cfgk/stubs && rm cfgk/libvdkernel_stub.a && rm cfgk/libvdkernel_stub_weak.a;
+echo "";
+echo "DONE!";
+echo "";
+)
