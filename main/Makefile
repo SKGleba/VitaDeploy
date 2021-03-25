@@ -4,7 +4,7 @@ LIBS = -lSceLibKernel_stub -lSceVshBridge_stub -lSceAppMgr_stub -ltaihen_stub -l
 
 PREFIX  = arm-vita-eabi
 CC      = $(PREFIX)-gcc
-CFLAGS  = -Wl,-q -Wall -O3
+CFLAGS  = -Wl,-q -Wall -Wno-multichar -O3
 ASFLAGS = $(CFLAGS)
 
 all: main.bin

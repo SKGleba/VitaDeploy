@@ -1,0 +1,131 @@
+# PSP2 System Configuration for Release
+#
+# [NOTICE]
+# 
+# This configuration is only for kernel_boot_loader_release.self.
+#
+
+load    os0:kd/clockgen.skprx
+#load	os0:kd/syscon.skprx
+#load	os0:kd/rtc.skprx
+
+#load	os0:kd/sm_comm.skprx
+#load	os0:kd/ss_mgr.skprx
+load	os0:kd/idstorage.skprx
+
+load	os0:kd/ctrl.skprx
+load	os0:kd/touch_dummy.skprx
+load	os0:kd/motion_dummy.skprx
+load	os0:kd/codec.skprx
+load	os0:kd/audio.skprx
+load	os0:kd/hpremote.skprx
+load	os0:kd/power.skprx
+
+load	os0:kd/usbd.skprx
+load	os0:kd/udcd.skprx
+load	os0:kd/usbserv.skprx
+load	os0:kd/usbserial.skprx
+load	os0:kd/usbmtp.skprx
+load	os0:kd/mtpif.skprx
+
+load	os0:kd/post_ss_mgr.skprx
+load	os0:kd/update_mgr.skprx
+load	os0:kd/regmgr.skprx
+
+if USB_ENUM_WAKEUP
+load	os0:kd/enum_wakeup.skprx
+else
+
+load	os0:kd/vnz_wrapper.skprx
+#load	os0:kd/applier.skprx
+- load	os0:kd/mgkeymgr.skprx
+
+load	os0:kd/error.skprx
+
+#load	os0:kd/gcauthmgr.skprx
+load	os0:kd/npdrm.skprx
+
+load	os0:kd/ulobjmgr.skprx
+
+load	os0:kd/net_ps.skprx
+load	os0:kd/gps.skprx
+load	os0:kd/bbmc.skprx
+load	os0:kd/wlanbt.skprx
+load	os0:kd/usb_ether_smsc.skprx
+load	os0:kd/usb_ether_rtl.skprx
+load	os0:kd/bt.skprx
+load	os0:kd/usbstor.skprx
+load	os0:kd/usbstorvstor.skprx
+load	os0:kd/usbpspcm.skprx
+
+- load  os0:kd/magicgate.skprx
+- load  os0:kd/usbstormg.skprx
+- load  os0:kd/mgvideo.skprx
+
+load	os0:kd/avcodec.skprx
+load	os0:kd/audioin.skprx
+load	os0:kd/ngs.skprx
+load	os0:kd/ds3.skprx
+load	os0:kd/usbaudio.skprx
+if SAFE_MODE
+load	os0:kd/umass.skprx
+endif
+load	os0:kd/hid.skprx
+
+load   os0:kd/gpu_es4.skprx
+load   os0:kd/gpuinit_es4.skprx
+
+- load	os0:kd/compat.skprx
+load	os0:kd/camera_dummy.skprx
+load	os0:kd/coredump.skprx
+
+if BSOD_REBOOT
+load	os0:kd/crashdump.skprx
+endif
+
+load	os0:kd/av_config.skprx
+load	os0:kd/fios2.skprx
+load	os0:kd/pfsmgr.skprx
+load	os0:kd/appmgr.skprx
+
+load	os0:kd/sysmodule.skprx
+load	os0:kd/vshbridge.skprx
+load	os0:kd/marlin_hci.skprx
+load	os0:kd/krm.skprx
+- load	os0:kd/tty2uart.skprx
+
+umount_bootfs
+
+if MANUFACTURING_MODE
+- spawnwait	sd0:psp2diag.self
+- spawnwait	ux0:psp2diag.self
+endif
+
+if SAFE_MODE
+spawn	os0:ue/safemode.self
+end
+endif
+
+if UPDATE_MODE
+if UD0_EXIST
+spawn ud0:PSP2UPDATE/psp2swu.self
+else
+spawn ur0:PSP2UPDATE/psp2swu.self
+endif
+end
+endif
+
+- load	ur0:tai/taihen.skprx
+- load	ur0:tai/henkaku.skprx
+
+- appspawn vs0:vsh/shell/shell.self SHELL_BUDGET_ID
+
+endif
+end
+
+# Local variables:
+# mode: c
+# tab-width: 4
+# c-basic-offset: 4
+# coding: utf-8
+# End: 

@@ -1,14 +1,23 @@
 TITLE_ID = SKGD3PL0Y
 TARGET   = VitaDeploy
 
-all: $(TARGET).vpk
+ifdef mshell
+VPKNAME  = VitaDeploy-mshell
+SHELLF   = mshell.self
+else
+VPKNAME  = VitaDeploy
+SHELLF   = vshell.self
+endif
+
+all: $(VPKNAME).vpk
 
 %.vpk: eboot.bin
 	vita-mksfoex -s TITLE_ID=$(TITLE_ID) "$(TARGET)" param.sfo;
 	vita-pack-vpk -s param.sfo -b eboot.bin \
+	-a res/tv-cfg.txt=rdparty/tv-cfg.txt \
 	-a res/naavls.skprx=plugins/naavls.skprx \
 	-a res/vs.sfo=sce_sys/vs.sfo \
-	-a res/mshell.self=mshell.self \
+	-a res/$(SHELLF)=vshell.self \
 	-a res/imcunlock.skprx=plugins/imcunlock.skprx -a res/imcunlock.self=imcunlock.self \
 	-a res/tiny_modoru.self=tiny_modoru.self -a res/tiny_modoru.suprx=rdparty/tiny_modoru.suprx -a res/tiny_modoru.skprx=plugins/tiny_modoru.skprx \
 	-a res/enso_365.eo=rdparty/enso_365.eo -a res/enso_360.eo=rdparty/enso_360.eo \

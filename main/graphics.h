@@ -24,6 +24,9 @@ int psvDebugScreenGetX();
 int psvDebugScreenGetY();
 void psvDebugScreenSetXY();
 
+// draw rectangle
+void draw_rect(int x, int y, int width, int height, Color color);
+
 enum {
 	COLOR_CYAN = 0xFFFFFF00,
 	COLOR_WHITE = 0xFFFFFFFF,
@@ -34,4 +37,10 @@ enum {
 	COLOR_GREEN = 0xFF00FF00,
 	COLOR_BLUE = 0xFFFF0000,
 	COLOR_PURPLE = 0xFFFF00FF,
+};
+
+enum {
+	SCREEN_YC = 544,
+	PROGRESS_BAR_WIDTH = 960,
+	PROGRESS_BAR_HEIGHT = 20
 };

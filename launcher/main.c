@@ -23,12 +23,12 @@ int main(int argc, char *argv[]) {
 	
 	if (ls == 0x8002D013 || ls == 0x800D2000) { // already loaded
 		ls = vdKUcmd(4, 1);
-		if (ls > 0)
+		if ((int)ls > 0)
 			vdKUcmd(0, 0);
 	}
 	
 	if ((int)ls < 0) // other error
-		sceAppMgrLoadExec("app0:mshell.self", NULL, NULL);
+		sceAppMgrLoadExec("app0:vshell.self", NULL, NULL);
 	else if (ls == 0) // VitaDeploy
 		sceAppMgrLoadExec("app0:main.self", NULL, NULL);
 	else // in-app settings menu

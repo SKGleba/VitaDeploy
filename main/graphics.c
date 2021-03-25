@@ -12,9 +12,9 @@
 enum {
 	SCREEN_WIDTH = 960,
 	SCREEN_HEIGHT = 544,
-	LINE_SIZE = 960,
+	LINE_SIZE = SCREEN_WIDTH,
 	FRAMEBUFFER_SIZE = 2 * 1024 * 1024,
-	FRAMEBUFFER_ALIGNMENT = 256 * 1024
+	FRAMEBUFFER_ALIGNMENT = 256 * 1024,
 };
 
 typedef union
@@ -179,4 +179,12 @@ Color psvDebugScreenSetBgColor(Color color) {
 	Color prev_color = g_bg_color;
 	g_bg_color = color;
 	return prev_color;
+}
+
+void draw_rect(int x, int y, int width, int height, Color color) {
+	void* base = psvDebugScreenGetVram();
+
+	for (int j = y; j < y + height; ++j)
+		for (int i = x; i < x + width; ++i)
+			((uint32_t*)base)[j * LINE_SIZE + i] = color;
 }

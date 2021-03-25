@@ -40,7 +40,7 @@ const char* app_id[] = {
 const uint32_t fw_n[4] = { 0x03730011, 0x03600011, 0x03650011, 0x03680011 };
 
 static int storno = 0, target_fs = F_TYPE_EXFAT;
-static int fwv = 0, taiv = 0, repo = 0, mdr_enso = 0;
+static int fwv = 0, taiv = 0, repo = 0, mdr_enso = 0, tv = 0;
 static SceUID g_hooks[7];
 static char appi_cfg[16];
 
@@ -87,9 +87,11 @@ static int sceRegMgrSetKeyInt_SceSystemSettingsCore_patched(const char *category
       storno = value;
     return 0;
   } else if (sceClibStrncmp(category, "/CONFIG/CMDR", 12) == 0) {
-    if (sceClibStrncmp(name, "taicfg", 6) == 0)
+    if (sceClibStrncmp(name, "taicfg", 6) == 0) {
+      if (tv && value == 4)
+        value = 3;
       taiv = value;
-    else if (sceClibStrncmp(name, "target", 6) == 0)
+    } else if (sceClibStrncmp(name, "target", 6) == 0)
       fwv = value;
     else if (sceClibStrncmp(name, "backup", 6) == 0)
       repo = value;
@@ -131,7 +133,7 @@ static int OnButtonEventSettings_patched(const char *id, int a2, void *a3) {
     vdKUcmd(4, 0);
     vdKUcmd(5, 2);
     vdKUcmd(6, 2);
-    vdKUcmd(7, 4);
+    vdKUcmd(7, (tv) ? 3 : 4);
     vdKUcmd(10, repo);
     vdKUcmd(11, 1);
     return sceAppMgrLaunchAppByUri(0xFFFFF, (vdKUcmd(2, 0)) ? "near:" : "psgm:play?titleid=SKGD3PL0Y");
@@ -164,6 +166,12 @@ static int OnButtonEventSettings_patched(const char *id, int a2, void *a3) {
     vdKUcmd(8, (void *)appi_cfg);
     vdKUcmd(10, repo);
     return sceAppMgrLaunchAppByUri(0xFFFFF, (vdKUcmd(2, 0)) ? "near:" : "psgm:play?titleid=SKGD3PL0Y");
+  } else if (sceClibStrncmp(id, "id_vi", 5) == 0) {
+    if (vdKUcmd(2, 0))
+      return -1;
+    vdKUcmd(4, 0);
+    vdKUcmd(5, 5);
+    return sceAppMgrLaunchAppByUri(0xFFFFF, "psgm:play?titleid=SKGD3PL0Y");
   }
   return g_OnButtonEventSettings_hook(id, a2, a3);
 }
@@ -258,6 +266,7 @@ void _start() __attribute__ ((weak, alias ("module_start")));
 int module_start(SceSize argc, const void *args) { 
   vdKUcmd(5, 0);
   memset(appi_cfg, 0, 16);
+  tv = vshSblAimgrIsGenuineDolce();
   g_hooks[0] = taiHookFunctionImport(&g_sceKernelLoadStartModule_SceSettings_hook, 
                                       "SceSettings", 
                                       0xCAE9ACE6, // SceLibKernel
