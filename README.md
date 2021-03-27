@@ -29,19 +29,19 @@ Toolbox that makes homebrewing the Playstation Vita/TV easier
 ![ref1](https://github.com/SKGleba/VitaDeploy/raw/main/screenshots/install_os_pup.png)
 
 ## Notes
-- I wrote a small (guide)[https://hackmyvita.gitbook.io/start] to hacking the vita from scratch using VD
-- If you do not have network access you can (download)[https://mega.nz/folder/egoijADB#aBS8os-NEToqbLcrysjwiw] the packages manually
+- I wrote a small [guide](https://hackmyvita.gitbook.io/start) to hacking the vita from scratch using VD
+- If you do not have network access you can [download](https://mega.nz/folder/egoijADB#aBS8os-NEToqbLcrysjwiw) the packages manually
   - Put the zip in "ur0:vd-udl.zip", VD will skip OS and tai download
 - "Format Storage"/"Clean the update partition" does not work on 3.73
   - This will probably be fixed in future updates
 
 ## Included tools
-- (VitaShell)[https://github.com/TheOfficialFloW/VitaShell]
-- (tiny modoru)[https://github.com/SKGleba/modoru/tree/tiny]
-- (universal enso)[https://github.com/SKGleba/enso]
-- (IMCUnlock)[https://github.com/SKGleba/IMCUnlock]
-- (YAMT)[https://github.com/SKGleba/yamt-vita]
-- (Vita-NoAutoAvls)[https://github.com/SKGleba/VITA-NoAutoAvls]
+- [VitaShell](https://github.com/TheOfficialFloW/VitaShell)
+- [tiny modoru](https://github.com/SKGleba/modoru/tree/tiny)
+- [universal enso](https://github.com/SKGleba/enso)
+- [IMCUnlock](https://github.com/SKGleba/IMCUnlock)
+- [YAMT](https://github.com/SKGleba/yamt-vita)
+- [Vita-NoAutoAvls](https://github.com/SKGleba/VITA-NoAutoAvls)
 
 ## Credits
 - Team Molecule for taiHENkaku and enso
@@ -50,4 +50,4 @@ Toolbox that makes homebrewing the Playstation Vita/TV easier
 - all vitasdk contributors
 
 ### Donation
-- Via (ko-fi)[https://ko-fi.com/skgleba], thanks!
+- Via [ko-fi](https://ko-fi.com/skgleba), thanks!
