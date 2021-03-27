@@ -60,7 +60,7 @@
       <!-- GitLab -->
       <toggle_switch id="use_backup" key="/CONFIG/CMDR/backup" title="Use the backup server" description="Switches to the GitLab repo for file downloads" icon="tex_system"/>
       <!-- VD->VS -->
-      <button id="id_vi" icon="tex_spanner" title="Replace 'near' with VitaDeploy" error_dialog_message="error: Already running on vs0!"/>
+      <button id="id_vi" icon="tex_format" title="Replace 'near' with VitaDeploy" error_dialog_message="error: Already running on vs0!"/>
       <!-- FatFormat -->
       <setting_list id="id_frdr" icon="tex_spanner" title="Format a storage device">
         <list id="id_frdr_stor" key="/CONFIG/FRDR/target" icon="tex_spanner" title="Target:">
@@ -80,7 +80,7 @@
       <!-- IMCUnlock -->
       <button id="id_iu" icon="tex_spanner" title="Create an internal memory card"/>
       <!-- NAAVLS -->
-      <button id="id_na" icon="tex_spanner" title="Toggle the AutoAVLS feature" success_dialog_message="Done" error_dialog_message="Failed"/>
+      <button id="id_na" icon="tex_format" title="Toggle the AutoAVLS feature" success_dialog_message="Done" error_dialog_message="Failed"/>
       <!-- IDU off -->
       <button id="id_dm" icon="tex_format" title="Disable IDU mode" success_dialog_message="Disabled, please reboot" error_dialog_message="Failed"/>
       <!-- PM off -->

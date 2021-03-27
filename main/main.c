@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2021 skgleba
+ *
+ * This software may be modified and distributed under the terms
+ * of the MIT license.  See the LICENSE file for details.
+ */
+
 #include <psp2/kernel/processmgr.h>
 #include <psp2/kernel/modulemgr.h>
 #include <psp2/io/fcntl.h>
@@ -29,7 +36,7 @@
 #define HMV_DOMAIN (((('srv' + '0') ^ SKG_DOMAIN) << 0b10) * 0x18) + (('Tu@' - '0') >> 2)
 
 #define LOCALNET 0
-#define PC_IP_STRING "192.168.88.249"
+#define PC_IP_STRING "127.0.0.1"
 
 static int mlink = 0;
 static char appi_cfg[16], dl_link_buf[128];
@@ -335,10 +342,23 @@ void vs0install(void) {
 	return;
 }
 
+int tryLocalUdZip(int puppy) {
+	sceIoRemove("ur0:DELETE_ME.VDTMP");
+	if (sceIoRename("ur0:vd-udl.zip", "ur0:DELETE_ME.VDTMP") >= 0) {
+		printf("Skipping update and tai download!\nExtracting ur0:vd-udl.zip...\n");
+		if (unzip("ur0:DELETE_ME.VDTMP", "ud0:") < 0)
+			dead("invalid zip file!");
+		printf("Extract tai configuration: %s\n", (unzip("ud0:ur0-patch.zip", (puppy) ? "ur0:" : "ud0:ur0-patch") < 0) ? "failed!" : "ok");
+		sceIoRename("ur0:DELETE_ME.VDTMP", "ur0:vd-udl.zip");
+		return 0;
+	}
+	return -1;
+}
+
 int main(int argc, char *argv[]) {
 	psvDebugScreenInit();
 	psvDebugScreenSetFgColor(COLOR_CYAN);
-	printf("VitaDeploy v0.8 by SKGleba\n\n");
+	printf("VitaDeploy v1.0 by SKGleba\n\n");
 	psvDebugScreenSetFgColor(COLOR_YELLOW);
 	sceIoSync("ud0:", 0);
 	sceIoRemove("ud0:enso.eo");
@@ -353,14 +373,16 @@ int main(int argc, char *argv[]) {
 			launchKernel(kernel[1]);
 			break;
 		case 2:
-			net(1);
-			if (pupDL(tfw) < 0)
-				dead("Update download failed!\n");
-			if (taiDL(vdKUcmd(7, 0), 1) < 0)
-				dead("Tai patch install failed!\n");
+			if (tryLocalUdZip(1) < 0) {
+				net(1);
+				if (pupDL(tfw) < 0)
+					dead("Update download failed!\n");
+				if (taiDL(vdKUcmd(7, 0), 1) < 0)
+					dead("Tai patch install failed!\n");
+				net(0);
+			}
 			if (vshSblAimgrIsGenuineDolce() && fcp("app0:rdparty/tv-cfg.txt", "ur0:tai/boot_config.txt") < 0)
 				dead("PSTV bootconfig install failed!\n");
-			net(0);
 			if (vdKUcmd(11, 0)) {
 				if (tfw == 1 && fcp("app0:rdparty/enso_360.eo", "ud0:enso.eo") < 0)
 					dead("Could not copy the enso 3.60 exploit!");
