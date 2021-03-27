@@ -1,7 +1,7 @@
 # VitaDeploy
 Toolbox that makes homebrewing the Playstation Vita/TV easier
 
-![ref0](https://github.com/SKGleba/VitaDeploy/raw/master/screenshots/main_menu.png)
+![ref0](https://github.com/SKGleba/VitaDeploy/raw/main/screenshots/main_menu.png)
 
 ## Features
 - file manager (VitaShell)
@@ -26,7 +26,7 @@ Toolbox that makes homebrewing the Playstation Vita/TV easier
 - "Quick install" installs the 3.65 OS with the R+YAMT preset
 - You can install your own PUP by putting it in ud0:PSP2UPDATE/
 
-![ref1](https://github.com/SKGleba/VitaDeploy/raw/master/screenshots/install_os_pup.png)
+![ref1](https://github.com/SKGleba/VitaDeploy/raw/main/screenshots/install_os_pup.png)
 
 ## Notes
 - I wrote a small (guide)[https://hackmyvita.gitbook.io/start] to hacking the vita from scratch using VD
