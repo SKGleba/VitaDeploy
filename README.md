@@ -34,6 +34,7 @@ Toolbox that makes homebrewing the Playstation Vita/TV easier
   - Put the zip in "ur0:vd-udl.zip", VD will skip OS and tai download
 - "Format Storage"/"Clean the update partition" does not work on 3.73
   - This will probably be fixed in future updates
+- It is recommended to disable all plugins before using VitaDeploy
 
 ## Included tools
 - [VitaShell](https://github.com/TheOfficialFloW/VitaShell)
