@@ -32,6 +32,7 @@ static char *stor_str[] = {
 const char* app_id[] = {
   "vshl",
   "vhbb",
+  "bhbb",
   "itls",
   "enso",
   "yamt",
