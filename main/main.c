@@ -62,6 +62,7 @@ const char apps[3][12][32] = {
 { // names on the server
 	"shell.vpk",
 	"vhbb.vpk",
+	"bhbb.vpk",
 	"itls.vpk",
 	"enso.vpk",
 	"yamt.vpk",
@@ -76,6 +77,7 @@ const char apps[3][12][32] = {
 { // names to display
 	"VitaShell",
 	"VHBB",
+	"BHBB",
 	"the iTLS installer",
 	"the enso installer",
 	"the YAMT installer",
@@ -90,6 +92,7 @@ const char apps[3][12][32] = {
 { // names on vita
 	"ux0:downloads/VitaShell.vpk",
 	"ux0:downloads/VHBB.vpk",
+	"ux0:downloads/BHBB.vpk",
 	"ux0:downloads/iTLS.vpk",
 	"ux0:downloads/enso.vpk",
 	"ux0:downloads/YAMT.vpk",
