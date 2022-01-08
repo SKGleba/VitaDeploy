@@ -44,6 +44,7 @@
       <label id="id_applist_label" title="Application list:"/>
       <toggle_switch id="dl_vshell" key="/CONFIG/APPI/vshl" title="VitaShell" description="A powerful file manager" icon="tex_system"/>
       <toggle_switch id="dl_hbrowser" key="/CONFIG/APPI/vhbb" title="Vita Homebrew Browser" description="A homebrew store/database" icon="tex_system"/>
+      <toggle_switch id="dl_bhbrowser" key="/CONFIG/APPI/bvhbb" title="Better Homebrew Browser" description="A homebrew store/database thats actually good" icon="tex_system"/>
       <toggle_switch id="dl_itls" key="/CONFIG/APPI/itls" title="iTLS installer" description="iTLS adds TLSv1.2 support in older firmwares" icon="tex_system"/>
       <toggle_switch id="dl_enso" key="/CONFIG/APPI/enso" title="enso installer" description="enso is a permanent hack for 3.60/3.65" icon="tex_system"/>
       <toggle_switch id="dl_yamt" key="/CONFIG/APPI/yamt" title="YAMT installer" description="YAMT is a storage manager and driver for the SD2Vita adapter" icon="tex_system"/>
