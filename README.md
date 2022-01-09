@@ -31,7 +31,7 @@ Toolbox that makes homebrewing the Playstation Vita/TV easier
 ### App downloader
 Don't know what to put here
 
-![ref1](https://github.com/SKGleba/VitaDeploy/raw/main/screenshots/install_ox_pup.png)
+![ref1](https://github.com/hedhehd/VitaDeploy/blob/main/screenshots/appdl.png)
 
 ## Notes
 - I wrote a small [guide](https://hackmyvita.gitbook.io/start) to hacking the vita from scratch using VD
