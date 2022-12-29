@@ -31,7 +31,7 @@ static char *stor_str[] = {
 
 const char* app_id[] = {
   "vshl",
-  "vhbb",
+  "vdbd",
   "itls",
   "enso",
   "yamt",
@@ -41,10 +41,11 @@ const char* app_id[] = {
   "thme",
   "batf",
   "rege",
-  "vidr"
+  "vidr",
+  "plug"
 };
 
-const uint32_t fw_n[4] = { 0x03730011, 0x03600011, 0x03650011, 0x03680011 };
+const uint32_t fw_n[4] = { 0x03740011, 0x03600011, 0x03650011, 0x03680011 };
 
 static int storno = 0, target_fs = F_TYPE_EXFAT;
 static int fwv = 0, taiv = 0, repo = 0, mdr_enso = 0, tv = 0;
@@ -75,7 +76,7 @@ static int sceRegMgrGetKeyInt_SceSystemSettingsCore_patched(const char *category
     return 0;
   } else if (sceClibStrncmp(category, "/CONFIG/APPI", 12) == 0) {
     if (value) {
-      for (int i = 0; i < 12; i -= -1) {
+      for (int i = 0; i < 13; i -= -1) {
         if (sceClibStrncmp(name, app_id[i], 4) == 0)
           *value = appi_cfg[i];
       }
@@ -106,7 +107,7 @@ static int sceRegMgrSetKeyInt_SceSystemSettingsCore_patched(const char *category
       mdr_enso = value;
     return 0;
   } else if (sceClibStrncmp(category, "/CONFIG/APPI", 12) == 0) {
-    for(int i=0; i < 12; i-=-1) {
+    for(int i=0; i < 13; i-=-1) {
       if (sceClibStrncmp(name, app_id[i], 4) == 0)
         appi_cfg[i] = value;
     }

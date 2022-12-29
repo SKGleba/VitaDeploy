@@ -25,10 +25,17 @@
 #include <string.h>
 #include <taihen.h>
 #include "graphics.h"
-#include "Archives.h"
+#include "unzip.h"
 #include "crc32.c"
 
 #define printf psvDebugScreenPrintf
+#define COLORPRINTF(color, ...)                \
+	do {                                       \
+		psvDebugScreenSetFgColor(color);       \
+		printf(__VA_ARGS__);     \
+		psvDebugScreenSetFgColor(COLOR_YELLOW); \
+	} while (0)
+
 #define CHUNK_SIZE 64 * 1024
 #define hasEndSlash(path) (path[strlen(path) - 1] == '/')
 
@@ -58,10 +65,10 @@ const uint32_t fwcrc[3][2] = {
 	{0xA1C5DE91, 0x90931C42}
 };
 
-const char apps[3][12][32] = {
+const char apps[3][13][32] = {
 { // names on the server
 	"shell.vpk",
-	"vhbb.vpk",
+	"vdbdl.vpk",
 	"itls.vpk",
 	"enso.vpk",
 	"yamt.vpk",
@@ -71,11 +78,12 @@ const char apps[3][12][32] = {
 	"thememgr.vpk",
 	"battery.vpk",
 	"reg.vpk",
-	"ident.vpk"
+	"ident.vpk",
+	"aplugen.vpk"
 },
 { // names to display
 	"VitaShell",
-	"VHBB",
+	"VitaDB Downloader",
 	"the iTLS installer",
 	"the enso installer",
 	"the YAMT installer",
@@ -85,11 +93,12 @@ const char apps[3][12][32] = {
 	"Custom Themes Manager",
 	"batteryFixer",
 	"registry editor",
-	"PSVident"
+	"PSVident",
+	"Autoplugin"
 },
 { // names on vita
 	"ux0:downloads/VitaShell.vpk",
-	"ux0:downloads/VHBB.vpk",
+	"ux0:downloads/vdbdl.vpk",
 	"ux0:downloads/iTLS.vpk",
 	"ux0:downloads/enso.vpk",
 	"ux0:downloads/YAMT.vpk",
@@ -99,7 +108,8 @@ const char apps[3][12][32] = {
 	"ux0:downloads/ThemeManager.vpk",
 	"ux0:downloads/batteryFixer.vpk",
 	"ux0:downloads/regEdit.vpk",
-	"ux0:downloads/PSVident.vpk"
+	"ux0:downloads/PSVident.vpk",
+	"ux0:downloads/Autoplugin.vpk"
 }
 };
 
@@ -123,13 +133,6 @@ int launchKernel(const char* kpath) {
 	argg.pid = KERNEL_PID;
 	int ret = taiLoadStartKernelModuleForUser("ud0:vd_ktmp.skprx", &argg);
 	sceClibPrintf("kmodule: 0x%X\n", ret);
-	return ret;
-}
-
-int unzip(const char* src, const char* dst) {
-	Zip* handle = ZipOpen(src);
-	int ret = ZipExtract(handle, NULL, dst);
-	ZipClose(handle);
 	return ret;
 }
 
@@ -263,44 +266,19 @@ dl_urpatch:
 		sceIoSync("ud0:ur0-patch.zip", 0);
 	}
 	printf("Extracting the tai configuration...\n");
-	return unzip("ud0:ur0-patch.zip", (puppy) ? "ur0:" : "ud0:ur0-patch");
-}
-
-int e2xDL(void) {
-	int retry = 1;
-	sceIoRmdir("ud0:os0-patch");
-	sceIoRemove("ud0:os0-patch.zip");
-	printf("Downloading the enso_ex files...\n");
-	sceClibMemset(dl_link_buf, 0, 128);
-#if LOCALNET
-	sceClibSnprintf(dl_link_buf, 128, "http://" PC_IP_STRING "/e2x/%s", ensozip);
-#else
-	sceClibSnprintf(dl_link_buf, 128, "http://%s.%x.xyz/e2x/%s", mlink ? "bkp" : "hen", HMV_DOMAIN, ensozip);
-#endif
-dl_ospatch:
-	if (download_file(dl_link_buf, "ud0:os0-patch.zip", "ud0:os0-patch.zip.TMP", 0) < 0) {
-		if (retry) {
-			printf("Failed! Retrying...\n");
-			retry = 0;
-			goto dl_ospatch;
-		}
-		printf("Failed to download the enso_ex files.\n");
-		return -1;
-	}
-	sceIoSync("ud0:", 0);
-	sceIoSync("ud0:os0-patch.zip", 0);
-	printf("Extracting the enso_ex files...\n");
-	return unzip("ud0:os0-patch.zip", "ud0:os0-patch");
+	return extract("ud0:ur0-patch.zip", (puppy) ? "ur0:" : "ud0:ur0-patch");
 }
 
 int getApps(void) {
 	if (mlink > 1)
 		return -1;
+	if (load_sce_paf() < 0)
+		COLORPRINTF(COLOR_RED, "Could not load the PAF module!");
 	sceIoMkdir("ux0:downloads", 0777);
 	int retry;
-	for(int i=0; i<12; i-=-1) {
+	for(int i=0; i<13; i-=-1) {
 		if (appi_cfg[i]) {
-			printf("Downloading %s...\n", apps[1][i]);
+			printf("%s : ", apps[1][i]);
 			retry = 1;
 			sceClibMemset(dl_link_buf, 0, 128);
 #if LOCALNET
@@ -309,46 +287,135 @@ int getApps(void) {
 			sceClibSnprintf(dl_link_buf, 128, "http://%s.%x.xyz/vpk/%s", mlink ? "bkp" : "hen", HMV_DOMAIN, apps[0][i]);
 #endif
 dl_app:
+			COLORPRINTF(COLOR_PURPLE, "download..");
 			if (download_file(dl_link_buf, apps[2][i], "ux0:downloads/tmp.vpk", 0) < 0) {
 				if (retry) {
-					printf("Failed! Retrying...\n");
-					retry = 0;
+					COLORPRINTF(COLOR_RED, "failed, retry ");
+					retry--;
 					goto dl_app;
 				}
-				printf("Failed to download %s.\n", apps[1][i]);
+				COLORPRINTF(COLOR_RED, "failed\nFailed to download %s.\n", apps[1][i]);
 				return -1;
 			}
+			COLORPRINTF(COLOR_PURPLE, "extract..");
+			removeDir("ux0:temp/app");
+			sceIoMkdir("ux0:temp/app", 0777);
+			if (extract(apps[2][i], "ux0:temp/app") < 0) {
+				COLORPRINTF(COLOR_RED, "failed\nFailed to extract %s.\n", apps[2][i]);
+				return -1;
+			}
+			COLORPRINTF(COLOR_PURPLE, "promote..");
+			if (promoteApp("ux0:temp/app") < 0) {
+				COLORPRINTF(COLOR_RED, "failed\nFailed to promote ux0:temp/app\n");
+				return -1;
+			}
+			printf(" : ");
+			COLORPRINTF(COLOR_GREEN, "OK\n");
 		}
 	}
-	printf("\nSaved app packages to ux0:downloads/\n");
+	printf("\nAll apps have been successfully installed\n");
+	unload_sce_paf();
 	return 0;
 }
 
 void vs0install(void) {
-	printf("Replacing NEAR with VitaDeploy...\n\n");
+	COLORPRINTF(COLOR_WHITE, "This replaces the discontinued \"near\" app with VitaDeploy.\nRequires reboot to take effect.\n\n");
+	COLORPRINTF(COLOR_YELLOW, "WARNING: this will cause your bubble layout to be reset\n\n");
+	COLORPRINTF(COLOR_CYAN, "SQUARE: Replace NEAR with VitaDeploy\nTRIANGLE: Restore NEAR\nCIRCLE: Exit\n");
+	sceKernelDelayThread(0.5 * 1000 * 1000);
+	SceCtrlData pad;
+	while (1) {
+		sceCtrlPeekBufferPositive(0, &pad, 1);
+		if (pad.buttons == SCE_CTRL_SQUARE)
+			break;
+		else if (pad.buttons == SCE_CTRL_CIRCLE)
+			return;
+		else if (pad.buttons == SCE_CTRL_TRIANGLE) {
+			printf("Preparing to restore NEAR..\n");
+			void* buf = malloc(0x100);
+			vshIoUmount(0x300, 0, 0, 0);
+			vshIoUmount(0x300, 1, 0, 0);
+			_vshIoMount(0x300, 0, 2, buf);
+			sceIoMkdir("ux0:temp/", 0777);
+			removeDir("ux0:temp/app");
+			sceIoMkdir("ux0:temp/app", 0777);
+			int ret = copyDir("vs0:app/NPXS10000/near_backup", "ux0:temp/app");
+			if (ret < 0)
+				dead("Could not prepare NEAR for restore!\n");
+			printf("Removing VitaDeploy..\n");
+			ret = removeDir("vs0:app/NPXS10000");
+			if (ret < 0) {
+				printf("Failed 0x%08X, rebooting in 5s\n", ret);
+				sceKernelDelayThread(5 * 1000 * 1000);
+				scePowerRequestColdReset();
+				sceKernelDelayThread(2 * 1000 * 1000);
+				dead("You really should not be seeing this\n");
+			}
+			printf("Restoring NEAR..\n");
+			ret = copyDir("ux0:temp/app", "vs0:app/NPXS10000");
+			if (ret < 0)
+				dead("NEAR restore failed!\n");
+			printf("Removing the application database\n");
+			sceIoRemove("ur0:shell/db/app.db");
+			printf("Cleaning up..\n");
+			removeDir("ux0:temp/app");
+			printf("All done, rebooting in 5s\n");
+			sceKernelDelayThread(5 * 1000 * 1000);
+			scePowerRequestColdReset();
+			sceKernelDelayThread(2 * 1000 * 1000);
+			dead("You really should not be seeing this\n");
+		}
+	}
+
+	printf("Backing up VitaDeploy\n");
+
 	void* buf = malloc(0x100);
 	vshIoUmount(0x300, 0, 0, 0);
 	vshIoUmount(0x300, 1, 0, 0);
 	_vshIoMount(0x300, 0, 2, buf);
-	if (copyDir("ux0:app/SKGD3PL0Y", "vs0:app/NPXS10000") < 0)
-		dead("Could not copyDir!\n");
-	if (sceIoRemove("vs0:app/NPXS10000/sce_sys/param.sfo") < 0 || sceIoRename("vs0:app/NPXS10000/sce_sys/vs.sfo", "vs0:app/NPXS10000/sce_sys/param.sfo") < 0)
-		dead("Could not update the SFO!");
-	if (sceIoRemove("ur0:shell/db/app.db") < 0)
-		dead("app.db remove failed\n");
+	
+	sceIoMkdir("ux0:temp/", 0777);
+	removeDir("ux0:temp/app");
+	sceIoMkdir("ux0:temp/app", 0777);
+	int res = copyDir("ux0:app/SKGD3PL0Y", "ux0:temp/app");
+	if (res < 0)
+		dead("VitaDeploy backup failed!\n");
+
+	printf("Backing up NEAR\n");
+	res = copyDir("vs0:app/NPXS10000", "ux0:temp/app/near_backup");
+	if (res < 0)
+		dead("NEAR backup failed!\n");
+
+	printf("Preparing to replace near..\n");
+	sceIoRemove("ux0:temp/app/sce_sys/param.sfo");
+	sceIoRename("ux0:temp/app/sce_sys/vs.sfo", "ux0:temp/app/sce_sys/param.sfo");
+
+	printf("Replacing NEAR\n");
+	removeDir("vs0:app/NPXS10000");
+	res = copyDir("ux0:temp/app", "vs0:app/NPXS10000");
+	if (res < 0)
+		dead("Could not replace NEAR!\n");
+
+	printf("Removing the application database\n");
+	sceIoRemove("ur0:shell/db/app.db");
+
+	printf("Cleaning up..\n");
+	removeDir("ux0:temp/app");
+
+	printf("All done, rebooting in 5s\n");
+	sceKernelDelayThread(5 * 1000 * 1000);
 	scePowerRequestColdReset();
 	sceKernelDelayThread(2 * 1000 * 1000);
 	dead("You really should not be seeing this\n");
-	return;
 }
 
 int tryLocalUdZip(int puppy) {
 	sceIoRemove("ur0:DELETE_ME.VDTMP");
 	if (sceIoRename("ur0:vd-udl.zip", "ur0:DELETE_ME.VDTMP") >= 0) {
 		printf("Skipping update and tai download!\nExtracting ur0:vd-udl.zip...\n");
-		if (unzip("ur0:DELETE_ME.VDTMP", "ud0:") < 0)
+		if (extract("ur0:DELETE_ME.VDTMP", "ud0:") < 0)
 			dead("invalid zip file!");
-		printf("Extract tai configuration: %s\n", (unzip("ud0:ur0-patch.zip", (puppy) ? "ur0:" : "ud0:ur0-patch") < 0) ? "failed!" : "ok");
+		printf("Extract tai configuration: %s\n", (extract("ud0:ur0-patch.zip", (puppy) ? "ur0:" : "ud0:ur0-patch") < 0) ? "failed!" : "ok");
 		sceIoRename("ur0:DELETE_ME.VDTMP", "ur0:vd-udl.zip");
 		return 0;
 	}
@@ -358,7 +425,7 @@ int tryLocalUdZip(int puppy) {
 int main(int argc, char *argv[]) {
 	psvDebugScreenInit();
 	psvDebugScreenSetFgColor(COLOR_CYAN);
-	printf("VitaDeploy v1.0 by SKGleba\n\n");
+	printf("VitaDeploy v1.1 by SKGleba\n\n");
 	psvDebugScreenSetFgColor(COLOR_YELLOW);
 	sceIoSync("ud0:", 0);
 	sceIoRemove("ud0:enso.eo");
@@ -398,9 +465,11 @@ int main(int argc, char *argv[]) {
 			vdKUcmd(9, (void*)appi_cfg);
 			net(1);
 			if (getApps() < 0)
-				dead("app downloader failed!\n");
+				dead("app installer failed!\n");
 			net(0);
-			setShellDir("ux0:downloads/", sizeof("ux0:downloads/"));
+			psvDebugScreenSetFgColor(COLOR_WHITE);
+			printf("you can now exit this app\n");
+			while (1) {};
 			mode = 0;
 			break;
 		case 5:

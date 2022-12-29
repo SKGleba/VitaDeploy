@@ -7,7 +7,6 @@
 
 #include <psp2kern/kernel/cpu.h>
 #include <psp2kern/kernel/modulemgr.h>
-#include <psp2kern/kernel/sysmem.h>
 #include <psp2kern/io/fcntl.h>
 
 #include <stdio.h>
@@ -162,8 +161,8 @@ int vdKUcmd(int cmd, uint32_t arg) {
 void _start() __attribute__ ((weak, alias("module_start")));
 int module_start(SceSize args, void *argp) {
 	
-	fw = *(uint32_t*)(*(int*)(ksceSysrootGetSysbase() + 0x6c) + 4);
-	minfw = *(uint32_t*)(*(int*)(ksceSysrootGetSysbase() + 0x6c) + 8);
+	fw = *(uint32_t*)(*(int*)(ksceSysrootGetSysroot() + 0x6c) + 4);
+	minfw = *(uint32_t*)(*(int*)(ksceSysrootGetSysroot() + 0x6c) + 8);
 	larg = 1;
 	memset(appi_cfg, 0, 16);
 	

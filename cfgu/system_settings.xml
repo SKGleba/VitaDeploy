@@ -43,7 +43,7 @@
       <!-- spacer -->
       <label id="id_applist_label" title="Application list:"/>
       <toggle_switch id="dl_vshell" key="/CONFIG/APPI/vshl" title="VitaShell" description="A powerful file manager" icon="tex_system"/>
-      <toggle_switch id="dl_hbrowser" key="/CONFIG/APPI/vhbb" title="Vita Homebrew Browser" description="A homebrew store/database" icon="tex_system"/>
+      <toggle_switch id="dl_hbrowser" key="/CONFIG/APPI/vdbd" title="VitaDB downloader" description="A homebrew store/database" icon="tex_system"/>
       <toggle_switch id="dl_itls" key="/CONFIG/APPI/itls" title="iTLS installer" description="iTLS adds TLSv1.2 support in older firmwares" icon="tex_system"/>
       <toggle_switch id="dl_enso" key="/CONFIG/APPI/enso" title="enso installer" description="enso is a permanent hack for 3.60/3.65" icon="tex_system"/>
       <toggle_switch id="dl_yamt" key="/CONFIG/APPI/yamt" title="YAMT installer" description="YAMT is a storage manager and driver for the SD2Vita adapter" icon="tex_system"/>
@@ -54,6 +54,7 @@
       <toggle_switch id="dl_batfix" key="/CONFIG/APPI/batf" title="batteryFixer" description="Fixes common battery issues" icon="tex_system"/>
       <toggle_switch id="dl_regedit" key="/CONFIG/APPI/rege" title="Registry Editor" icon="tex_system"/>
       <toggle_switch id="dl_psvident" key="/CONFIG/APPI/vidr" title="PSVident" description="Shows advanced console info" icon="tex_system"/>
+      <toggle_switch id="dl_aplugen" key="/CONFIG/APPI/plug" title="AutoPlugin" description="Plugin downloader and installer" icon="tex_system"/>
     </setting_list>
     <!-- misc -->
     <setting_list id="id_misc" icon="tex_spanner" title="Miscellaneous">

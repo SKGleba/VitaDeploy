@@ -29,7 +29,7 @@ echo "";
 cd ../main/;
 make -s;
 mv main.bin ../main.self;
-rm main.o && rm graphics.o && rm font.o && rm Archives.o && rm main.elf && rm main.velf;
+rm main.o && rm graphics.o && rm font.o && rm promote.o && rm main.elf && rm main.velf && rm ioapi.o && rm sha1.o && rm unzip.o;
 echo "";
 echo "Creating app packages";
 echo "";

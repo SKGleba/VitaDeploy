@@ -10,7 +10,7 @@ Toolbox that makes homebrewing the Playstation Vita/TV easier
   - 3.65 preset "Quick Install"
   - optional enso install
   - optional taihen setup
-- app downloader (for core hb apps)
+- app downloader and installer (for core hb apps)
 - internal memory creation tool (imcunlock)
 - storage format utility
 - AutoAVLS enable/disable
