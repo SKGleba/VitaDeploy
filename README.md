@@ -49,6 +49,3 @@ Toolbox that makes homebrewing the Playstation Vita/TV easier
 - theflow0 for modoru
 - xerpi for vita2d
 - all vitasdk contributors
-
-### Donation
-- Via [ko-fi](https://ko-fi.com/skgleba), thanks!
