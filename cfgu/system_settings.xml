@@ -3,8 +3,6 @@
   <setting_list id="vd_main_screen" title="VitaDeploy">
     <!-- molecularshell -->
     <button id="id_ms" icon="tex_format" title="File Manager"/>
-    <!-- sd2vita-as-grw0 -->
-    <button id="id_gc" icon="tex_format" title="Mount SD2Vita to grw0:" success_dialog_message="Mounted" error_dialog_message="Failed"/>
     <!-- spacer -->
     <label id="id_unsafe" title="System customization:"/>
     <!-- Update -->
@@ -54,7 +52,6 @@
       <toggle_switch id="dl_batfix" key="/CONFIG/APPI/batf" title="batteryFixer" description="Fixes common battery issues" icon="tex_system"/>
       <toggle_switch id="dl_regedit" key="/CONFIG/APPI/rege" title="Registry Editor" icon="tex_system"/>
       <toggle_switch id="dl_psvident" key="/CONFIG/APPI/vidr" title="PSVident" description="Shows advanced console info" icon="tex_system"/>
-      <toggle_switch id="dl_aplugen" key="/CONFIG/APPI/plug" title="AutoPlugin" description="Plugin downloader and installer" icon="tex_system"/>
     </setting_list>
     <!-- misc -->
     <setting_list id="id_misc" icon="tex_spanner" title="Miscellaneous">
@@ -62,6 +59,8 @@
       <toggle_switch id="use_backup" key="/CONFIG/CMDR/backup" title="Use the backup server" description="Switches to the GitLab repo for file downloads" icon="tex_system"/>
       <!-- VD->VS -->
       <button id="id_vi" icon="tex_format" title="Replace 'near' with VitaDeploy" error_dialog_message="error: Already running on vs0!"/>
+      <!-- sd2vita-as-grw0 -->
+      <button id="id_gc" icon="tex_format" title="Mount SD2Vita to grw0:" success_dialog_message="Mounted" error_dialog_message="Failed"/>
       <!-- FatFormat -->
       <setting_list id="id_frdr" icon="tex_spanner" title="Format a storage device">
         <list id="id_frdr_stor" key="/CONFIG/FRDR/target" icon="tex_spanner" title="Target:">

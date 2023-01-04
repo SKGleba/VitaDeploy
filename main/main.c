@@ -45,6 +45,8 @@
 #define LOCALNET 0
 #define PC_IP_STRING "127.0.0.1"
 
+#define DLC_APP_COUNT 12
+
 static int mlink = 0;
 static char appi_cfg[16], dl_link_buf[128];
 const char minor[4][32] = {"app0:vshell.self","app0:imcunlock.self","app0:tiny_modoru.self","app0:fwtool_portable.self"};
@@ -65,7 +67,7 @@ const uint32_t fwcrc[3][2] = {
 	{0xA1C5DE91, 0x90931C42}
 };
 
-const char apps[3][13][32] = {
+const char apps[3][DLC_APP_COUNT][32] = {
 { // names on the server
 	"shell.vpk",
 	"vdbdl.vpk",
@@ -79,7 +81,6 @@ const char apps[3][13][32] = {
 	"battery.vpk",
 	"reg.vpk",
 	"ident.vpk",
-	"aplugen.vpk"
 },
 { // names to display
 	"VitaShell",
@@ -94,7 +95,6 @@ const char apps[3][13][32] = {
 	"batteryFixer",
 	"registry editor",
 	"PSVident",
-	"Autoplugin"
 },
 { // names on vita
 	"ux0:downloads/VitaShell.vpk",
@@ -109,7 +109,6 @@ const char apps[3][13][32] = {
 	"ux0:downloads/batteryFixer.vpk",
 	"ux0:downloads/regEdit.vpk",
 	"ux0:downloads/PSVident.vpk",
-	"ux0:downloads/Autoplugin.vpk"
 }
 };
 
@@ -276,7 +275,7 @@ int getApps(void) {
 		COLORPRINTF(COLOR_RED, "Could not load the PAF module!");
 	sceIoMkdir("ux0:downloads", 0777);
 	int retry;
-	for(int i=0; i<13; i-=-1) {
+	for(int i=0; i<DLC_APP_COUNT; i-=-1) {
 		if (appi_cfg[i]) {
 			printf("%s : ", apps[1][i]);
 			retry = 1;
@@ -425,7 +424,7 @@ int tryLocalUdZip(int puppy) {
 int main(int argc, char *argv[]) {
 	psvDebugScreenInit();
 	psvDebugScreenSetFgColor(COLOR_CYAN);
-	printf("VitaDeploy v1.1 by SKGleba\n\n");
+	printf("VitaDeploy v1.1.1 by SKGleba\n\n");
 	psvDebugScreenSetFgColor(COLOR_YELLOW);
 	sceIoSync("ud0:", 0);
 	sceIoRemove("ud0:enso.eo");

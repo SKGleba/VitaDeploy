@@ -29,6 +29,7 @@ static char *stor_str[] = {
 	"sdstor0:xmc-lp-ign-userext"
 };
 
+#define DLC_APP_COUNT 12
 const char* app_id[] = {
   "vshl",
   "vdbd",
@@ -41,8 +42,7 @@ const char* app_id[] = {
   "thme",
   "batf",
   "rege",
-  "vidr",
-  "plug"
+  "vidr"
 };
 
 const uint32_t fw_n[4] = { 0x03740011, 0x03600011, 0x03650011, 0x03680011 };
@@ -76,7 +76,7 @@ static int sceRegMgrGetKeyInt_SceSystemSettingsCore_patched(const char *category
     return 0;
   } else if (sceClibStrncmp(category, "/CONFIG/APPI", 12) == 0) {
     if (value) {
-      for (int i = 0; i < 13; i -= -1) {
+      for (int i = 0; i < DLC_APP_COUNT; i -= -1) {
         if (sceClibStrncmp(name, app_id[i], 4) == 0)
           *value = appi_cfg[i];
       }
@@ -107,7 +107,7 @@ static int sceRegMgrSetKeyInt_SceSystemSettingsCore_patched(const char *category
       mdr_enso = value;
     return 0;
   } else if (sceClibStrncmp(category, "/CONFIG/APPI", 12) == 0) {
-    for(int i=0; i < 13; i-=-1) {
+    for (int i = 0; i < DLC_APP_COUNT; i -= -1) {
       if (sceClibStrncmp(name, app_id[i], 4) == 0)
         appi_cfg[i] = value;
     }
