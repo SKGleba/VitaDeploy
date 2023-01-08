@@ -424,7 +424,7 @@ int tryLocalUdZip(int puppy) {
 int main(int argc, char *argv[]) {
 	psvDebugScreenInit();
 	psvDebugScreenSetFgColor(COLOR_CYAN);
-	printf("VitaDeploy v1.1.1 by SKGleba\n\n");
+	printf("VitaDeploy v1.2 by SKGleba\n\n");
 	psvDebugScreenSetFgColor(COLOR_YELLOW);
 	sceIoSync("ud0:", 0);
 	sceIoRemove("ud0:enso.eo");

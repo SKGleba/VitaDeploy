@@ -128,6 +128,8 @@ static int OnButtonEventSettings_patched(const char *id, int a2, void *a3) {
     return vshSysconIduModeClear();
   else if (sceClibStrncmp(id, "id_pm", 5) == 0)
     return sceSblPmMgrSetProductModeOffForUser();
+  else if (sceClibStrncmp(id, "id_bf", 5) == 0)
+    return vdKUcmd(12, 0);
   else if (sceClibStrncmp(id, "id_ms", 5) == 0) {
     vdKUcmd(4, -1);
     return sceAppMgrLaunchAppByUri(0xFFFFF, (vdKUcmd(2, 0)) ? "near:" : "psgm:play?titleid=SKGD3PL0Y");

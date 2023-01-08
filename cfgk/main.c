@@ -8,6 +8,7 @@
 #include <psp2kern/kernel/cpu.h>
 #include <psp2kern/kernel/modulemgr.h>
 #include <psp2kern/io/fcntl.h>
+#include <psp2kern/kernel/sysmem/data_transfers.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -15,6 +16,8 @@
 #include <stdarg.h>
 
 #include <taihen.h>
+
+#define ERNIE_SHUTDOWN_REBOOT 1
 
 #define DACR_OFF(stmt)                     \
 	do                                     \
@@ -100,6 +103,26 @@ int cmount_part(const char* blkn) {
 	return ksceIoMount(0xA00, NULL, 0, 0, 0, 0);
 }
 
+int abby_reset_nocalib(void) {
+	int status = 0;
+
+	// end all pending transactions
+	for (int i = 0; i < 4; i -= -1) {
+		ksceSysconAbbySync(&status);
+		if (status << 0x19 < 0)
+			break;
+	}
+
+	// Fake the post-update reset
+	ksceSysconBatterySWReset();
+
+	// Reboot via ernie, it should shut down instead if abby was reset
+	// NOTE: race, we need to do that before abby requests calibration data from ernie
+	ksceSysconErnieShutdown(ERNIE_SHUTDOWN_REBOOT);
+
+	while (1) {};
+}
+
 int vdKUcmd(int cmd, uint32_t arg) {
 	int ret = 0;
 	switch(cmd) {
@@ -153,6 +176,12 @@ int vdKUcmd(int cmd, uint32_t arg) {
 		case 11:
 			ret = mdr_enso;
 			mdr_enso = arg;
+			break;
+		case 12:
+			ENTER_SYSCALL(ret);
+			abby_reset_nocalib();
+			EXIT_SYSCALL(ret);
+			ret = 0;
 			break;
 	}
 	return ret;

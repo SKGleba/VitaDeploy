@@ -58,13 +58,18 @@ static int formatBlkDev(char *dev, int fst, int external) {
 	} else {
 		if (module_get_offset(info.modid, 0, 0x15b20d, &FatFormatProxy) < 0)
 			return -1;
-		if (*(uint16_t *)FatFormatProxy == 0xf0e9) {
+		if (*(uint16_t *)FatFormatProxy == 0xf0e9) { // ~3.65?
 			cargs_off = 0x15e752;
 			ffproxy_off = 0x15b20c;
-		} else {
+		} else { // ~3.60?
 			cargs_off = 0x15e74e;
 			ffproxy_off = 0x15b208;
 			module_get_offset(info.modid, 0, ffproxy_off + 1, &FatFormatProxy);
+			if (*(uint16_t*)FatFormatProxy != 0xf0e9) { // ~3.74?
+				cargs_off = 0x15c716;
+				ffproxy_off = 0x1591d0;
+				module_get_offset(info.modid, 0, ffproxy_off + 1, &FatFormatProxy);
+			}
 		}
 	}
 	

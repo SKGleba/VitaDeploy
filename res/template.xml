@@ -7,7 +7,7 @@
 
 	<frame id="frame1">
         <liveitem>
-            <target>http://deploy.psp2.dev/</target>
+            <target>http://jailbreak.psp2.dev/</target>
             <background x="20" y="-10" >hen.png</background>
         </liveitem>
     </frame>
@@ -15,7 +15,7 @@
 	<frame id="frame3">
 		<liveitem>
 			<text valign="bottom" align="left" text-align="left" word-wrap="off" ellipsis="on">
-				<str size="24" color="#ffffff" shadow="on">VitaDeploy v1.1.1-public-safe</str>
+				<str size="24" color="#ffffff" shadow="on">VitaDeploy v1.2-public-safe</str>
 			</text>
 		</liveitem>
 	</frame>

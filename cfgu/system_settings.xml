@@ -79,6 +79,8 @@
       </setting_list>
       <!-- IMCUnlock -->
       <button id="id_iu" icon="tex_spanner" title="Create an internal memory card"/>
+      <!-- batteryFixer -->
+      <button id="id_bf" icon="tex_format" title="Reset the battery controller" success_dialog_message="Done" error_dialog_message="Failed"/>
       <!-- NAAVLS -->
       <button id="id_na" icon="tex_format" title="Toggle the AutoAVLS feature" success_dialog_message="Done" error_dialog_message="Failed"/>
       <!-- IDU off -->

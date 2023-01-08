@@ -26,6 +26,7 @@ target_link_libraries(vdkernel
   SceIofilemgrForDriver_stub
   SceSysrootForKernel_stub
   SceSysmemForDriver_stub
+  SceSysconForDriver_stub
 )
 
 vita_create_self(vdkernel.skprx vdkernel CONFIG vdkernel.yml UNSAFE)
