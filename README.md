@@ -13,6 +13,7 @@ Toolbox that makes homebrewing the Playstation Vita/TV easier
 - app downloader and installer (for core hb apps)
 - internal memory creation tool (imcunlock)
 - storage format utility
+- battery controller reset
 - AutoAVLS enable/disable
 - kiosk and manufacturing mode disable
 - can run entirely on vs0
@@ -32,8 +33,6 @@ Toolbox that makes homebrewing the Playstation Vita/TV easier
 - I wrote a small [guide](https://hackmyvita.gitbook.io/start) to hacking the vita from scratch using VD
 - If you do not have network access you can [download](https://mega.nz/folder/egoijADB#aBS8os-NEToqbLcrysjwiw) the packages manually
   - Put the zip in "ur0:vd-udl.zip", VD will skip OS and tai download
-- "Format Storage"/"Clean the update partition" does not work on 3.73
-  - This will probably be fixed in future updates
 - It is recommended to disable all plugins before using VitaDeploy
 
 ## Included tools
@@ -43,6 +42,7 @@ Toolbox that makes homebrewing the Playstation Vita/TV easier
 - [IMCUnlock](https://github.com/SKGleba/IMCUnlock)
 - [YAMT](https://github.com/SKGleba/yamt-vita)
 - [Vita-NoAutoAvls](https://github.com/SKGleba/VITA-NoAutoAvls)
+- [batteryFixer](https://github.com/SKGleba/PSP2-batteryFixer)
 
 ## Credits
 - Team Molecule for taiHENkaku and enso
