@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 skgleba
+ * Copyright (C) 2021-2023 skgleba
  *
  * This software may be modified and distributed under the terms
  * of the MIT license.  See the LICENSE file for details.
@@ -41,9 +41,12 @@
 
 #define SKG_DOMAIN '@w@'
 #define HMV_DOMAIN (((('srv' + '0') ^ SKG_DOMAIN) << 0b10) * 0x18) + (('Tu@' - '0') >> 2)
+#define DEV_DOMAIN "917hu8k0n73n7.psp2.dev"
 
 #define LOCALNET 0
 #define PC_IP_STRING "127.0.0.1"
+
+#define VERSION_STRING "VitaDeploy v1.2.1 by SKGleba"
 
 #define DLC_APP_COUNT 12
 
@@ -165,7 +168,10 @@ int pupDL(int ulink) {
 #if LOCALNET
 	sceClibSnprintf(dl_link_buf, 128, "http://" PC_IP_STRING "/bin/%s", swu);
 #else
-	sceClibSnprintf(dl_link_buf, 128, "http://%s.%x.xyz/bin/%s", mlink ? "bkp" : "hen", HMV_DOMAIN, swu);
+	if (mlink)
+		sceClibSnprintf(dl_link_buf, 128, "http://bkp.%x.xyz/bin/%s", HMV_DOMAIN, swu);
+	else
+		sceClibSnprintf(dl_link_buf, 128, "http://%s/bin/%s", DEV_DOMAIN, swu);
 #endif
 dl_swu:
 	if (download_file(dl_link_buf, "ud0:PSP2UPDATE/psp2swu.self", "ud0:PSP2UPDATE/psp2swu.self.TMP", 0x8853B7BD) < 0) {
@@ -183,7 +189,10 @@ dl_swu:
 #if LOCALNET
 		sceClibSnprintf(dl_link_buf, 128, "http://" PC_IP_STRING "/bin/%s", fwparts[ulink - 1][0]);
 #else
-		sceClibSnprintf(dl_link_buf, 128, "http://%s.%x.xyz/bin/%s", mlink ? "bkp" : "hen", HMV_DOMAIN, fwparts[ulink - 1][0]);
+		if (mlink)
+			sceClibSnprintf(dl_link_buf, 128, "http://bkp.%x.xyz/bin/%s", HMV_DOMAIN, fwparts[ulink - 1][0]);
+		else
+			sceClibSnprintf(dl_link_buf, 128, "http://%s/bin/%s", DEV_DOMAIN, fwparts[ulink - 1][0]);
 #endif
 dl_part1:
 		printf("Downloading the update package part 1...\n");
@@ -201,7 +210,10 @@ dl_part1:
 #if LOCALNET
 		sceClibSnprintf(dl_link_buf, 128, "http://" PC_IP_STRING "/bin/%s", fwparts[ulink - 1][1]);
 #else
-		sceClibSnprintf(dl_link_buf, 128, "http://%s.%x.xyz/bin/%s", mlink ? "bkp" : "hen", HMV_DOMAIN, fwparts[ulink - 1][1]);
+		if (mlink)
+			sceClibSnprintf(dl_link_buf, 128, "http://bkp.%x.xyz/bin/%s", HMV_DOMAIN, fwparts[ulink - 1][1]);
+		else
+			sceClibSnprintf(dl_link_buf, 128, "http://%s/bin/%s", DEV_DOMAIN, fwparts[ulink - 1][1]);
 #endif
 dl_part2:
 		printf("Downloading the update package part 2...\n");
@@ -249,7 +261,10 @@ int taiDL(int plink, int puppy) {
 #if LOCALNET
 		sceClibSnprintf(dl_link_buf, 128, "http://" PC_IP_STRING "/tai/%s", taizips[plink - 2]);
 #else
-		sceClibSnprintf(dl_link_buf, 128, "http://%s.%x.xyz/tai/%s", mlink ? "bkp" : "hen", HMV_DOMAIN, taizips[plink - 2]);
+		if (mlink)
+			sceClibSnprintf(dl_link_buf, 128, "http://bkp.%x.xyz/tai/%s", HMV_DOMAIN, taizips[plink - 2]);
+		else
+			sceClibSnprintf(dl_link_buf, 128, "http://%s/tai/%s", DEV_DOMAIN, taizips[plink - 2]);
 #endif
 dl_urpatch:
 		if (download_file(dl_link_buf, "ud0:ur0-patch.zip", "ud0:ur0-patch.zip.TMP", 0) < 0) {
@@ -283,7 +298,10 @@ int getApps(void) {
 #if LOCALNET
 			sceClibSnprintf(dl_link_buf, 128, "http://" PC_IP_STRING "/vpk/%s", apps[0][i]);
 #else
-			sceClibSnprintf(dl_link_buf, 128, "http://%s.%x.xyz/vpk/%s", mlink ? "bkp" : "hen", HMV_DOMAIN, apps[0][i]);
+			if (mlink)
+				sceClibSnprintf(dl_link_buf, 128, "http://bkp.%x.xyz/vpk/%s", HMV_DOMAIN, apps[0][i]);
+			else
+				sceClibSnprintf(dl_link_buf, 128, "http://%s/vpk/%s", DEV_DOMAIN, apps[0][i]);
 #endif
 dl_app:
 			COLORPRINTF(COLOR_PURPLE, "download..");
@@ -424,7 +442,7 @@ int tryLocalUdZip(int puppy) {
 int main(int argc, char *argv[]) {
 	psvDebugScreenInit();
 	psvDebugScreenSetFgColor(COLOR_CYAN);
-	printf("VitaDeploy v1.2 by SKGleba\n\n");
+	printf(VERSION_STRING "\n\n");
 	psvDebugScreenSetFgColor(COLOR_YELLOW);
 	sceIoSync("ud0:", 0);
 	sceIoRemove("ud0:enso.eo");
