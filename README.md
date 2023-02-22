@@ -1,5 +1,5 @@
 # VitaDeploy
-Toolbox that makes homebrewing the Playstation Vita/TV easier
+Toolbox that makes homebrewing the PlayStation Vita/TV easier
 
 ![ref0](https://github.com/SKGleba/VitaDeploy/raw/main/screenshots/main_menu.png)
 
