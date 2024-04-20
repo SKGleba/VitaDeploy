@@ -14,6 +14,8 @@
 #include <string.h>
 #include <taihen.h>
 
+#include "../cfgk/cfgk.h"
+
 int main(int argc, char *argv[]) {
 	
 	tai_module_args_t argg;
@@ -29,10 +31,10 @@ int main(int argc, char *argv[]) {
 	sceClibPrintf("load_kernel: 0x%X\n", ls);
 	
 	if (ls == 0x8002D013 || ls == 0x800D2000) { // already loaded
-		ls = vdKUcmd(4, 1);
-		if ((int)ls > 0)
-			vdKUcmd(0, 0);
-	}
+        ls = vdKUcmd(CFGK_BRIDGE_GET_SET_LAUNCHARG, 1);
+        if ((int)ls > 0)
+            vdKUcmd(CFGK_BRIDGE_SET_PATCHED, 0);
+    }
 	
 	if ((int)ls < 0) // other error
 		sceAppMgrLoadExec("app0:vshell.self", NULL, NULL);

@@ -15,7 +15,7 @@
 	<frame id="frame3">
 		<liveitem>
 			<text valign="bottom" align="left" text-align="left" word-wrap="off" ellipsis="on">
-				<str size="24" color="#ffffff" shadow="on">VitaDeploy v1.2.1-public-safe</str>
+				<str size="24" color="#ffffff" shadow="on">VitaDeploy v1.2.3-public-safe</str>
 			</text>
 		</liveitem>
 	</frame>

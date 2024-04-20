@@ -8,7 +8,7 @@
 #include <psp2kern/kernel/cpu.h>
 #include <psp2kern/kernel/modulemgr.h>
 #include <psp2kern/io/fcntl.h>
-#include <psp2kern/kernel/sysmem/data_transfers.h>
+// #include <psp2kern/kernel/sysmem/data_transfers.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -16,6 +16,8 @@
 #include <stdarg.h>
 
 #include <taihen.h>
+
+#include "cfgk.h"
 
 #define ERNIE_SHUTDOWN_REBOOT 1
 
@@ -126,58 +128,58 @@ int abby_reset_nocalib(void) {
 int vdKUcmd(int cmd, uint32_t arg) {
 	int ret = 0;
 	switch(cmd) {
-		case 0:
+		case CFGK_BRIDGE_SET_PATCHED:
 			patched = arg;
 			break;
-		case 1:
+		case CFGK_BRIDGE_EXT2GRW:
 			ret = cmount_part("sdstor0:ext-lp-act-entire");
 			break;
-		case 2:
+		case CFGK_BRIDGE_GET_LOC:
 			ret = loc;
 			break;
-		case 3:
+		case CFGK_BRIDGE_GET_MINFW:
 			if (arg == 0)
 				ret = (int)minfw;
 			else
 				ret = (minfw > arg);
 			break;
-		case 4:
+		case CFGK_BRIDGE_GET_SET_LAUNCHARG:
 			ret = larg;
 			larg = arg;
 			break;
-		case 5:
+		case CFGK_BRIDGE_GET_SET_SUBMAIN:
 			ret = minor;
 			minor = arg;
 			break;
-		case 6:
+		case CFGK_BRIDGE_GET_SET_FW_DL_LINK:
 			ret = fwdll;
 			fwdll = arg;
 			break;
-		case 7:
+		case CFGK_BRIDGE_GET_SET_TAI_DL_LINK:
 			ret = taidll;
 			taidll = arg;
 			break;
-		case 8:
+		case CFGK_BRIDGE_SET_APP_INSTALLER_CFG:
 			ENTER_SYSCALL(ret);
 			ksceKernelMemcpyUserToKernel(appi_cfg, arg, 16);
 			EXIT_SYSCALL(ret);
 			ret = 0;
 			break;
-		case 9:
+		case CFGK_BRIDGE_GET_APP_INSTALLER_CFG:
 			ENTER_SYSCALL(ret);
 			ksceKernelMemcpyKernelToUser(arg, appi_cfg, 16);
 			EXIT_SYSCALL(ret);
 			ret = 0;
 			break;
-		case 10:
+		case CFGK_BRIDGE_GET_SET_REMOTE:
 			ret = apex;
 			apex = arg;
 			break;
-		case 11:
+		case CFGK_BRIDGE_GET_SET_ENSO_FLAG:
 			ret = mdr_enso;
 			mdr_enso = arg;
 			break;
-		case 12:
+		case CFGK_BRIDGE_ABBY_RESET:
 			ENTER_SYSCALL(ret);
 			abby_reset_nocalib();
 			EXIT_SYSCALL(ret);
@@ -193,7 +195,7 @@ int module_start(SceSize args, void *argp) {
 	fw = *(uint32_t*)(*(int*)(ksceSysrootGetSysroot() + 0x6c) + 4);
 	minfw = *(uint32_t*)(*(int*)(ksceSysrootGetSysroot() + 0x6c) + 8);
 	larg = 1;
-	memset(appi_cfg, 0, 16);
+	memset(appi_cfg, 0, sizeof(appi_cfg));
 	
 	// allow GC-SD
 	char movsr01[2] = { 0x01, 0x20 };

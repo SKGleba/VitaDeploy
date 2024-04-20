@@ -15,6 +15,8 @@
 #include <taihen.h>
 #include <string.h>
 #include "FatFormatProxy.h"
+#include "../cfgk/cfgk.h"
+#include "../main/main.h"
 
 // custom system settings menu
 extern unsigned char _binary_system_settings_xml_start;
@@ -96,9 +98,9 @@ static int sceRegMgrSetKeyInt_SceSystemSettingsCore_patched(const char *category
     return 0;
   } else if (sceClibStrncmp(category, "/CONFIG/CMDR", 12) == 0) {
     if (sceClibStrncmp(name, "taicfg", 6) == 0) {
-      if (tv && value == 4)
-        value = 3;
-      taiv = value;
+        if (tv && value == MAIN_TAIS_DEFAULT_YAMT)
+            value = MAIN_TAIS_DEFAULT;
+        taiv = value;
     } else if (sceClibStrncmp(name, "target", 6) == 0)
       fwv = value;
     else if (sceClibStrncmp(name, "backup", 6) == 0)
@@ -123,64 +125,64 @@ static int OnButtonEventSettings_patched(const char *id, int a2, void *a3) {
   else if (sceClibStrncmp(id, "id_frdr_reboot", 14) == 0)
     return scePowerRequestColdReset();
   else if (sceClibStrncmp(id, "id_gc", 5) == 0)
-    return vdKUcmd(1, 0);
+    return vdKUcmd(CFGK_BRIDGE_EXT2GRW, 0);
   else if (sceClibStrncmp(id, "id_dm", 5) == 0)
     return vshSysconIduModeClear();
   else if (sceClibStrncmp(id, "id_pm", 5) == 0)
     return sceSblPmMgrSetProductModeOffForUser();
   else if (sceClibStrncmp(id, "id_bf", 5) == 0)
-    return vdKUcmd(12, 0);
+    return vdKUcmd(CFGK_BRIDGE_ABBY_RESET, 0);
   else if (sceClibStrncmp(id, "id_ms", 5) == 0) {
-    vdKUcmd(4, -1);
-    return sceAppMgrLaunchAppByUri(0xFFFFF, (vdKUcmd(2, 0)) ? "near:" : "psgm:play?titleid=SKGD3PL0Y");
+    vdKUcmd(CFGK_BRIDGE_GET_SET_LAUNCHARG, -1);
+    return sceAppMgrLaunchAppByUri(0xFFFFF, (vdKUcmd(CFGK_BRIDGE_GET_LOC, 0)) ? "near:" : "psgm:play?titleid=SKGD3PL0Y");
   } else if (sceClibStrncmp(id, "id_iu", 5) == 0) {
-    vdKUcmd(4, 0);
-    vdKUcmd(5, 1);
-    return sceAppMgrLaunchAppByUri(0xFFFFF, (vdKUcmd(2, 0)) ? "near:" : "psgm:play?titleid=SKGD3PL0Y");
+    vdKUcmd(CFGK_BRIDGE_GET_SET_LAUNCHARG, 0);
+    vdKUcmd(CFGK_BRIDGE_GET_SET_SUBMAIN, MAIN_SUBMAINS_IMCUNLOCK);
+    return sceAppMgrLaunchAppByUri(0xFFFFF, (vdKUcmd(CFGK_BRIDGE_GET_LOC, 0)) ? "near:" : "psgm:play?titleid=SKGD3PL0Y");
   } else if (sceClibStrncmp(id, "id_qi", 5) == 0) {
-    if (vdKUcmd(3, fw_n[2]))
+    if (vdKUcmd(CFGK_BRIDGE_GET_MINFW, fw_n[2]))
       return -1;
-    vdKUcmd(4, 0);
-    vdKUcmd(5, 2);
-    vdKUcmd(6, 2);
-    vdKUcmd(7, (tv) ? 3 : 4);
-    vdKUcmd(10, repo);
-    vdKUcmd(11, 1);
-    return sceAppMgrLaunchAppByUri(0xFFFFF, (vdKUcmd(2, 0)) ? "near:" : "psgm:play?titleid=SKGD3PL0Y");
+    vdKUcmd(CFGK_BRIDGE_GET_SET_LAUNCHARG, 0);
+    vdKUcmd(CFGK_BRIDGE_GET_SET_SUBMAIN, MAIN_SUBMAINS_MODORU);
+    vdKUcmd(CFGK_BRIDGE_GET_SET_FW_DL_LINK, MAIN_FWLINKS_365);
+    vdKUcmd(CFGK_BRIDGE_GET_SET_TAI_DL_LINK, (tv) ? MAIN_TAIS_DEFAULT : MAIN_TAIS_DEFAULT_YAMT);
+    vdKUcmd(CFGK_BRIDGE_GET_SET_REMOTE, repo);
+    vdKUcmd(CFGK_BRIDGE_GET_SET_ENSO_FLAG, 1);
+    return sceAppMgrLaunchAppByUri(0xFFFFF, (vdKUcmd(CFGK_BRIDGE_GET_LOC, 0)) ? "near:" : "psgm:play?titleid=SKGD3PL0Y");
   } else if (sceClibStrncmp(id, "id_uf", 5) == 0) {
     if (formatBlkDev("sdstor0:int-lp-ign-updater", F_TYPE_FAT16, 0) < 0)
       return -1;
     return scePowerRequestColdReset();
   } else if (sceClibStrncmp(id, "id_ip", 5) == 0) {
-    if (vdKUcmd(3, fw_n[fwv]))
+    if (vdKUcmd(CFGK_BRIDGE_GET_MINFW, fw_n[fwv]))
       return -1;
-    vdKUcmd(4, 0);
-    vdKUcmd(5, 2);
-    vdKUcmd(6, fwv);
-    vdKUcmd(7, taiv);
-    vdKUcmd(10, repo);
+    vdKUcmd(CFGK_BRIDGE_GET_SET_LAUNCHARG, 0);
+    vdKUcmd(CFGK_BRIDGE_GET_SET_SUBMAIN, MAIN_SUBMAINS_MODORU);
+    vdKUcmd(CFGK_BRIDGE_GET_SET_FW_DL_LINK, fwv);
+    vdKUcmd(CFGK_BRIDGE_GET_SET_TAI_DL_LINK, taiv);
+    vdKUcmd(CFGK_BRIDGE_GET_SET_REMOTE, repo);
     if (fwv == 1 || fwv == 2)
-      vdKUcmd(11, mdr_enso);
-    return sceAppMgrLaunchAppByUri(0xFFFFF, (vdKUcmd(2, 0)) ? "near:" : "psgm:play?titleid=SKGD3PL0Y");
+      vdKUcmd(CFGK_BRIDGE_GET_SET_ENSO_FLAG, mdr_enso);
+    return sceAppMgrLaunchAppByUri(0xFFFFF, (vdKUcmd(CFGK_BRIDGE_GET_LOC, 0)) ? "near:" : "psgm:play?titleid=SKGD3PL0Y");
   } else if (sceClibStrncmp(id, "id_na", 5) == 0) {
     tai_module_args_t argg;
     sceClibMemset(&argg, 0, sizeof(argg));
     argg.size = sizeof(argg);
     argg.pid = KERNEL_PID;
-    if (taiLoadStartKernelModuleForUser((vdKUcmd(2, 0)) ? "vs0:app/NPXS10000/plugins/naavls.skprx" : "ux0:app/SKGD3PL0Y/plugins/naavls.skprx", &argg) < 0)
+    if (taiLoadStartKernelModuleForUser((vdKUcmd(CFGK_BRIDGE_GET_LOC, 0)) ? "vs0:app/NPXS10000/plugins/naavls.skprx" : "ux0:app/SKGD3PL0Y/plugins/naavls.skprx", &argg) < 0)
       return -1;
     return 0;
   } else if (sceClibStrncmp(id, "id_ia", 5) == 0) {
-    vdKUcmd(4, 0);
-    vdKUcmd(5, 4);
-    vdKUcmd(8, (void *)appi_cfg);
-    vdKUcmd(10, repo);
-    return sceAppMgrLaunchAppByUri(0xFFFFF, (vdKUcmd(2, 0)) ? "near:" : "psgm:play?titleid=SKGD3PL0Y");
+    vdKUcmd(CFGK_BRIDGE_GET_SET_LAUNCHARG, 0);
+    vdKUcmd(CFGK_BRIDGE_GET_SET_SUBMAIN, MAIN_SUBMAINS_APPI);
+    vdKUcmd(CFGK_BRIDGE_SET_APP_INSTALLER_CFG, (void *)appi_cfg);
+    vdKUcmd(CFGK_BRIDGE_GET_SET_REMOTE, repo);
+    return sceAppMgrLaunchAppByUri(0xFFFFF, (vdKUcmd(CFGK_BRIDGE_GET_LOC, 0)) ? "near:" : "psgm:play?titleid=SKGD3PL0Y");
   } else if (sceClibStrncmp(id, "id_vi", 5) == 0) {
-    if (vdKUcmd(2, 0))
+    if (vdKUcmd(CFGK_BRIDGE_GET_LOC, 0))
       return -1;
-    vdKUcmd(4, 0);
-    vdKUcmd(5, 5);
+    vdKUcmd(CFGK_BRIDGE_GET_SET_LAUNCHARG, 0);
+    vdKUcmd(CFGK_BRIDGE_GET_SET_SUBMAIN, MAIN_SUBMAINS_RNEAR);
     return sceAppMgrLaunchAppByUri(0xFFFFF, "psgm:play?titleid=SKGD3PL0Y");
   }
   return g_OnButtonEventSettings_hook(id, a2, a3);
@@ -274,7 +276,7 @@ static int sceKernelStopUnloadModule_SceSettings_patched(SceUID modid, SceSize a
 
 void _start() __attribute__ ((weak, alias ("module_start")));
 int module_start(SceSize argc, const void *args) { 
-  vdKUcmd(5, 0);
+  vdKUcmd(CFGK_BRIDGE_GET_SET_SUBMAIN, 0);
   memset(appi_cfg, 0, 16);
   tv = vshSblAimgrIsGenuineDolce();
   g_hooks[0] = taiHookFunctionImport(&g_sceKernelLoadStartModule_SceSettings_hook, 

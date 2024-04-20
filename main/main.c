@@ -24,6 +24,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <taihen.h>
+
+#include "../cfgk/cfgk.h"
+#include "main.h"
+
 #include "graphics.h"
 #include "unzip.h"
 #include "crc32.c"
@@ -46,25 +50,28 @@
 #define LOCALNET 0
 #define PC_IP_STRING "127.0.0.1"
 
-#define VERSION_STRING "VitaDeploy v1.2.1 by SKGleba"
+#define VERSION_STRING "VitaDeploy v1.2.3 by SKGleba"
 
 #define DLC_APP_COUNT 12
 
 static int mlink = 0;
 static char appi_cfg[16], dl_link_buf[128];
-const char minor[4][32] = {"app0:vshell.self","app0:imcunlock.self","app0:tiny_modoru.self","app0:fwtool_portable.self"};
+const char minor[3][32] = {"app0:vshell.self","app0:imcunlock.self","app0:tiny_modoru.self"};
 const char kernel[4][32] = {"","app0:plugins/imcunlock.skprx","app0:plugins/tiny_modoru.skprx","app0:plugins/fwtool.skprx"};
-const char taizips[3][16] = { "v_tai.zip","r_tai.zip","y_tai.zip" };
+const char taizips[5][16] = { "ur0-patch.zip","disabled.zip","v_tai.zip","r_tai.zip","y_tai.zip" };
 const char* ensozip = "e2x_def.zip";
 const char* swu = "SWU.00";
 
-const char fwparts[3][2][8] = {
+const char fwparts[4][2][8] = {
+	{ "LOC.AL","LOC.AL"}, // invalid 
 	{ "360.01","360.02"},
 	{ "365.01","365.02"},
 	{ "368.01","368.02"}
 };
 
-const uint32_t fwcrc[3][2] = {
+#define EXPECTED_SWU_CRC 0x8853B7BD
+const uint32_t fwcrc[4][2] = {
+	{0,0}, // invalid
 	{0x71BF741C, 0x3359C77B},
 	{0xA475D0BD, 0x647EDCDF},
 	{0xA1C5DE91, 0x90931C42}
@@ -139,10 +146,10 @@ int launchKernel(const char* kpath) {
 }
 
 void setShellDir(const char* dir, uint32_t dirlen) {
-	if (dirlen > 127)
-		return;
 	char path[128];
-	memset(path, 0, 128);
+    if (dirlen > sizeof(path) - 1)
+        return;
+    memset(path, 0, sizeof(path));
 	memcpy(path, dir, dirlen);
 	sceIoMkdir("ux0:VitaShell", 0777);
 	sceIoMkdir("ux0:VitaShell/internal", 0777);
@@ -155,26 +162,26 @@ void setShellDir(const char* dir, uint32_t dirlen) {
 }
 
 int pupDL(int ulink) {
-	if (ulink > 4 || mlink > 1)
-		return -1;
+    if ((ulink > MAIN_FWLINKS_368) || (mlink > 1))
+        return -1;
 	sceKernelPowerLock(0); // don't want the screen to turn off during download
 	sceIoMkdir("ud0:PSP2UPDATE", 0777);
 	sceIoRemove("ud0:PSP2UPDATE/psp2swu.self");
-	if (ulink != 0)
-		sceIoRemove("ud0:PSP2UPDATE/PSP2UPDAT.PUP");
+    if (ulink != MAIN_FWLINKS_LOCAL)
+        sceIoRemove("ud0:PSP2UPDATE/PSP2UPDAT.PUP");
 	int ret = 0;
 	printf("Downloading the updater...\n");
-	sceClibMemset(dl_link_buf, 0, 128);
+	sceClibMemset(dl_link_buf, 0, sizeof(dl_link_buf));
 #if LOCALNET
 	sceClibSnprintf(dl_link_buf, 128, "http://" PC_IP_STRING "/bin/%s", swu);
 #else
 	if (mlink)
-		sceClibSnprintf(dl_link_buf, 128, "http://bkp.%x.xyz/bin/%s", HMV_DOMAIN, swu);
-	else
-		sceClibSnprintf(dl_link_buf, 128, "http://%s/bin/%s", DEV_DOMAIN, swu);
+        sceClibSnprintf(dl_link_buf, sizeof(dl_link_buf), "http://bkp.%x.xyz/bin/%s", HMV_DOMAIN, swu);
+    else
+        sceClibSnprintf(dl_link_buf, sizeof(dl_link_buf), "http://%s/bin/%s", DEV_DOMAIN, swu);
 #endif
 dl_swu:
-	if (download_file(dl_link_buf, "ud0:PSP2UPDATE/psp2swu.self", "ud0:PSP2UPDATE/psp2swu.self.TMP", 0x8853B7BD) < 0) {
+	if (download_file(dl_link_buf, "ud0:PSP2UPDATE/psp2swu.self", "ud0:PSP2UPDATE/psp2swu.self.TMP", EXPECTED_SWU_CRC) < 0) {
 		if (ret == 0) {
 			printf("Interrupted, retrying...\n");
 			ret = -1;
@@ -184,19 +191,19 @@ dl_swu:
 		goto syncexit;
 	}
 	ret = 0;
-	if (ulink != 0) {
-		sceClibMemset(dl_link_buf, 0, 128);
+    if (ulink != MAIN_FWLINKS_LOCAL) {
+        sceClibMemset(dl_link_buf, 0, sizeof(dl_link_buf));
 #if LOCALNET
-		sceClibSnprintf(dl_link_buf, 128, "http://" PC_IP_STRING "/bin/%s", fwparts[ulink - 1][0]);
+        sceClibSnprintf(dl_link_buf, sizeof(dl_link_buf), "http://" PC_IP_STRING "/bin/%s", fwparts[ulink][0]);
 #else
 		if (mlink)
-			sceClibSnprintf(dl_link_buf, 128, "http://bkp.%x.xyz/bin/%s", HMV_DOMAIN, fwparts[ulink - 1][0]);
-		else
-			sceClibSnprintf(dl_link_buf, 128, "http://%s/bin/%s", DEV_DOMAIN, fwparts[ulink - 1][0]);
+            sceClibSnprintf(dl_link_buf, sizeof(dl_link_buf), "http://bkp.%x.xyz/bin/%s", HMV_DOMAIN, fwparts[ulink][0]);
+        else
+            sceClibSnprintf(dl_link_buf, sizeof(dl_link_buf), "http://%s/bin/%s", DEV_DOMAIN, fwparts[ulink][0]);
 #endif
 dl_part1:
 		printf("Downloading the update package part 1...\n");
-		if (download_file(dl_link_buf, "ud0:PSP2UPDATE/PSP2UPDAT.PUP.TMP", "ud0:PSP2UPDATE/PSP2UPDAT.PUP.P1", fwcrc[ulink - 1][0]) < 0) {
+		if (download_file(dl_link_buf, "ud0:PSP2UPDATE/PSP2UPDAT.PUP.TMP", "ud0:PSP2UPDATE/PSP2UPDAT.PUP.P1", fwcrc[ulink][0]) < 0) {
 			if (ret == 0) {
 				printf("Interrupted, retrying...\n");
 				ret = -1;
@@ -206,18 +213,18 @@ dl_part1:
 			goto syncexit;
 		}
 		ret = 0;
-		sceClibMemset(dl_link_buf, 0, 128);
+        sceClibMemset(dl_link_buf, 0, sizeof(dl_link_buf));
 #if LOCALNET
-		sceClibSnprintf(dl_link_buf, 128, "http://" PC_IP_STRING "/bin/%s", fwparts[ulink - 1][1]);
+        sceClibSnprintf(dl_link_buf, sizeof(dl_link_buf), "http://" PC_IP_STRING "/bin/%s", fwparts[ulink][1]);
 #else
 		if (mlink)
-			sceClibSnprintf(dl_link_buf, 128, "http://bkp.%x.xyz/bin/%s", HMV_DOMAIN, fwparts[ulink - 1][1]);
-		else
-			sceClibSnprintf(dl_link_buf, 128, "http://%s/bin/%s", DEV_DOMAIN, fwparts[ulink - 1][1]);
+            sceClibSnprintf(dl_link_buf, sizeof(dl_link_buf), "http://bkp.%x.xyz/bin/%s", HMV_DOMAIN, fwparts[ulink][1]);
+        else
+            sceClibSnprintf(dl_link_buf, sizeof(dl_link_buf), "http://%s/bin/%s", DEV_DOMAIN, fwparts[ulink][1]);
 #endif
 dl_part2:
 		printf("Downloading the update package part 2...\n");
-		if (download_file(dl_link_buf, "ud0:PSP2UPDATE/PSP2UPDAT.PUP.TMP", NULL, fwcrc[ulink - 1][1]) < 0) {
+		if (download_file(dl_link_buf, "ud0:PSP2UPDATE/PSP2UPDAT.PUP.TMP", NULL, fwcrc[ulink][1]) < 0) {
 			if (ret == 0) {
 				printf("Interrupted, retrying...\n");
 				ret = -1;
@@ -231,8 +238,8 @@ dl_part2:
 			ret = -1;
 			goto syncexit;
 		}
-	}
-	ret = 0;
+}
+    ret = 0;
 syncexit:
 	sceIoSync("ud0:", 0);
 	sceIoSync("ud0:PSP2UPDATE/PSP2UPDAT.PUP", 0);
@@ -242,29 +249,29 @@ syncexit:
 }
 
 int taiDL(int plink, int puppy) {
-	if (plink > 4 || mlink > 1)
-		return -1;
+    if (plink > MAIN_TAIS_DEFAULT_YAMT || mlink > 1)
+        return -1;
 	printf("Backing up ur0:tai to ur0:tai_old...\n");
 	sceIoRmdir("ur0:tai_old");
 	sceIoRemove("ux0:tai/config.txt");
-	if (plink == 1) {
-		sceIoRename("ur0:tai", "ur0:tai_old");
+    if (plink == MAIN_TAIS_DISABLED) {
+        sceIoRename("ur0:tai", "ur0:tai_old");
 		return 0;
-	}
-	copyDir("ur0:tai", "ur0:tai_old");
+    }
+    copyDir("ur0:tai", "ur0:tai_old");
 	sceIoRemove("ur0:tai/boot_config.txt");
 	int retry = 1;
-	if (plink != 0) {
-		sceIoRemove("ud0:ur0-patch.zip");
+    if (plink != MAIN_TAIS_LOCAL) {
+        sceIoRemove("ud0:ur0-patch.zip");
 		printf("Downloading the tai configuration...\n");
-		sceClibMemset(dl_link_buf, 0, 128);
+        sceClibMemset(dl_link_buf, 0, sizeof(dl_link_buf));
 #if LOCALNET
-		sceClibSnprintf(dl_link_buf, 128, "http://" PC_IP_STRING "/tai/%s", taizips[plink - 2]);
+        sceClibSnprintf(dl_link_buf, sizeof(dl_link_buf), "http://" PC_IP_STRING "/tai/%s", taizips[plink]);
 #else
 		if (mlink)
-			sceClibSnprintf(dl_link_buf, 128, "http://bkp.%x.xyz/tai/%s", HMV_DOMAIN, taizips[plink - 2]);
-		else
-			sceClibSnprintf(dl_link_buf, 128, "http://%s/tai/%s", DEV_DOMAIN, taizips[plink - 2]);
+            sceClibSnprintf(dl_link_buf, sizeof(dl_link_buf), "http://bkp.%x.xyz/tai/%s", HMV_DOMAIN, taizips[plink]);
+        else
+            sceClibSnprintf(dl_link_buf, sizeof(dl_link_buf), "http://%s/tai/%s", DEV_DOMAIN, taizips[plink]);
 #endif
 dl_urpatch:
 		if (download_file(dl_link_buf, "ud0:ur0-patch.zip", "ud0:ur0-patch.zip.TMP", 0) < 0) {
@@ -278,8 +285,8 @@ dl_urpatch:
 		}
 		sceIoSync("ud0:", 0);
 		sceIoSync("ud0:ur0-patch.zip", 0);
-	}
-	printf("Extracting the tai configuration...\n");
+}
+    printf("Extracting the tai configuration...\n");
 	return extract("ud0:ur0-patch.zip", (puppy) ? "ur0:" : "ud0:ur0-patch");
 }
 
@@ -294,14 +301,14 @@ int getApps(void) {
 		if (appi_cfg[i]) {
 			printf("%s : ", apps[1][i]);
 			retry = 1;
-			sceClibMemset(dl_link_buf, 0, 128);
+            sceClibMemset(dl_link_buf, 0, sizeof(dl_link_buf));
 #if LOCALNET
-			sceClibSnprintf(dl_link_buf, 128, "http://" PC_IP_STRING "/vpk/%s", apps[0][i]);
+            sceClibSnprintf(dl_link_buf, sizeof(dl_link_buf), "http://" PC_IP_STRING "/vpk/%s", apps[0][i]);
 #else
 			if (mlink)
-				sceClibSnprintf(dl_link_buf, 128, "http://bkp.%x.xyz/vpk/%s", HMV_DOMAIN, apps[0][i]);
-			else
-				sceClibSnprintf(dl_link_buf, 128, "http://%s/vpk/%s", DEV_DOMAIN, apps[0][i]);
+                sceClibSnprintf(dl_link_buf, sizeof(dl_link_buf), "http://bkp.%x.xyz/vpk/%s", HMV_DOMAIN, apps[0][i]);
+            else
+                sceClibSnprintf(dl_link_buf, sizeof(dl_link_buf), "http://%s/vpk/%s", DEV_DOMAIN, apps[0][i]);
 #endif
 dl_app:
 			COLORPRINTF(COLOR_PURPLE, "download..");
@@ -399,9 +406,12 @@ void vs0install(void) {
 		dead("VitaDeploy backup failed!\n");
 
 	printf("Backing up NEAR\n");
-	res = copyDir("vs0:app/NPXS10000", "ux0:temp/app/near_backup");
-	if (res < 0)
-		dead("NEAR backup failed!\n");
+	res = copyDir("vs0:app/NPXS10000/near_backup", "ux0:temp/app/near_backup"); // if we are updating VitaDeploy, the backup is already there
+	if (res < 0) {
+		res = copyDir("vs0:app/NPXS10000", "ux0:temp/app/near_backup");
+		if (res < 0)
+			dead("NEAR backup failed!\n");
+	}
 
 	printf("Preparing to replace near..\n");
 	sceIoRemove("ux0:temp/app/sce_sys/param.sfo");
@@ -447,39 +457,39 @@ int main(int argc, char *argv[]) {
 	sceIoSync("ud0:", 0);
 	sceIoRemove("ud0:enso.eo");
 	sceIoRemove("ud0:vd_kmtp.skprx");
-	memset(appi_cfg, 0, 16);
-	mlink = vdKUcmd(10, 0);
-	int mode = vdKUcmd(5, 0);
-	int tfw = vdKUcmd(6, 0);
+	memset(appi_cfg, 0, sizeof(appi_cfg));
+	mlink = vdKUcmd(CFGK_BRIDGE_GET_SET_REMOTE, 0);
+	int mode = vdKUcmd(CFGK_BRIDGE_GET_SET_SUBMAIN, 0);
+	int tfw = vdKUcmd(CFGK_BRIDGE_GET_SET_FW_DL_LINK, 0);
 	sceClibPrintf("mode %d\n", mode);
 	switch(mode) {
-		case 1:
-			launchKernel(kernel[1]);
-			break;
-		case 2:
-			if (tryLocalUdZip(1) < 0) {
+        case MAIN_SUBMAINS_IMCUNLOCK:
+            launchKernel(kernel[MAIN_SUBMAINS_IMCUNLOCK]);
+            break;
+        case MAIN_SUBMAINS_MODORU:
+            if (tryLocalUdZip(1) < 0) {
 				net(1);
 				if (pupDL(tfw) < 0)
 					dead("Update download failed!\n");
-				if (taiDL(vdKUcmd(7, 0), 1) < 0)
+				if (taiDL(vdKUcmd(CFGK_BRIDGE_GET_SET_TAI_DL_LINK, 0), 1) < 0)
 					dead("Tai patch install failed!\n");
 				net(0);
 			}
 			if (vshSblAimgrIsGenuineDolce() && fcp("app0:rdparty/tv-cfg.txt", "ur0:tai/boot_config.txt") < 0)
 				dead("PSTV bootconfig install failed!\n");
-			if (vdKUcmd(11, 0)) {
-				if (tfw == 1 && fcp("app0:rdparty/enso_360.eo", "ud0:enso.eo") < 0)
-					dead("Could not copy the enso 3.60 exploit!");
-				else if (tfw == 2 && fcp("app0:rdparty/enso_365.eo", "ud0:enso.eo") < 0)
-					dead("Could not copy the enso 3.65 exploit!");
+			if (vdKUcmd(CFGK_BRIDGE_GET_SET_ENSO_FLAG, 0)) {
+                if (tfw == MAIN_FWLINKS_360 && fcp("app0:rdparty/enso_360.eo", "ud0:enso.eo") < 0)
+                    dead("Could not copy the enso 3.60 exploit!");
+                else if (tfw == MAIN_FWLINKS_365 && fcp("app0:rdparty/enso_365.eo", "ud0:enso.eo") < 0)
+                    dead("Could not copy the enso 3.65 exploit!");
 			}
-			if (launchKernel(kernel[2]) < 0)
-				dead("Could not load the kernel module!\n");
+            if (launchKernel(kernel[MAIN_SUBMAINS_MODORU]) < 0)
+                dead("Could not load the kernel module!\n");
 			if (fcp("app0:rdparty/tiny_modoru.suprx", "ud0:tiny_modoru_user.suprx") < 0)
 				dead("Could not copy the user module!\n");
 			break;
-		case 4:
-			vdKUcmd(9, (void*)appi_cfg);
+        case MAIN_SUBMAINS_APPI:
+            vdKUcmd(CFGK_BRIDGE_GET_APP_INSTALLER_CFG, (void*)appi_cfg);
 			net(1);
 			if (getApps() < 0)
 				dead("app installer failed!\n");
@@ -489,8 +499,8 @@ int main(int argc, char *argv[]) {
 			while (1) {};
 			mode = 0;
 			break;
-		case 5:
-			vs0install();
+        case MAIN_SUBMAINS_RNEAR:
+            vs0install();
 			mode = 0;
 			break;
 		default:
